@@ -118,13 +118,13 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
         }}
       />
       
-      {/* Navigation Arrows (placed safely relative to container, far left/right) */}
+      {/* Navigation Arrows (Stacked Text over Arrow) */}
       <div style={styles.leftNav} onClick={handlePrev}>
         <div style={styles.navTextContainer}>
           <span style={styles.navText}>{prevProject.title.split(',')[0]}</span>
         </div>
-        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '8px'}}>
-          <path d="M10 10L60 10M10 10L16 4M10 10L16 16" stroke="#1a1a1a" strokeWidth="1.5"/>
+        <svg width="60" height="12" viewBox="0 0 60 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 6H60M0 6L6 0M0 6L6 12" stroke="#1a1a1a" strokeWidth="1"/>
         </svg>
       </div>
 
@@ -132,8 +132,8 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
         <div style={styles.navTextContainer}>
           <span style={styles.navText}>{nextProject.title.split(',')[0]}</span>
         </div>
-        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '8px'}}>
-          <path d="M0 10L50 10M50 10L44 4M50 10L44 16" stroke="#1a1a1a" strokeWidth="1.5"/>
+        <svg width="60" height="12" viewBox="0 0 60 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0 6H60M60 6L54 0M60 6L54 12" stroke="#1a1a1a" strokeWidth="1"/>
         </svg>
       </div>
 
@@ -143,46 +143,46 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
           transform: `translate(${mouseOffset.x * 1}px, ${mouseOffset.y * 1}px) scale(1.02)`
         }}
       >
-        {/* EXACT CENTERING LAYOUT: 
-            The layout relies on a central flex container that leaves safe margins on left/right for arrows.
-             We use 5 exact equal columns + physical 16px gap dividers.
-        */}
         <div style={styles.contentWrapper}>
           
-          <StripColumn flex="1" top="15%" window="60%" bottom="25%" />
+          <StripColumn flex="1" top="10%" window="80%" bottom="10%" />
           
           <div style={styles.gap}>
-             {/* STICKY SONG BANNER absolutely positioned inside the gap to not affect flex widths */}
+             {/* STICKY SONG BANNER anchored to top of screen */}
             <div style={styles.stickyBannerWrapper}>
               <div style={styles.blackBanner}>
                 <span style={styles.verticalBannerText}>{project.song}</span>
                 <button onClick={toggleSong} style={styles.playButton} aria-label={isPlayingSong ? "Pause Song" : "Play Song"}>
                   {isPlayingSong ? (
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                    <svg width="8" height="10" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                   ) : (
-                    <Play size={10} color="white" fill="white" style={{ marginLeft: 2 }} />
+                    <svg width="10" height="12" viewBox="0 0 24 24" fill="white"><path d="M5 3l14 9-14 9v-18z"/></svg>
                   )}
                 </button>
               </div>
             </div>
           </div>
           
-          <StripColumn flex="1" top="5%" window="75%" bottom="20%" />
+          <StripColumn flex="1" top="15%" window="75%" bottom="10%" />
           <div style={styles.gap} />
           
-          <StripColumn flex="1" top="22%" window="50%" bottom="28%" />
+          <StripColumn flex="1" top="5%" window="90%" bottom="5%" />
           <div style={styles.gap} />
-          <StripColumn flex="1" top="12%" window="80%" bottom="8%" />
           
-          {/* Title Area (positioned cleanly away from top nav) */}
+          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
+          <div style={styles.gap} />
+          
+          <StripColumn flex="1" top="8%" window="82%" bottom="10%" />
+          
+          {/* Title Area */}
           <div style={styles.titleArea}>
             <div style={styles.titleContainer}>
               <h1 style={styles.verticalTitle}>{project.title.split(',')[0]}</h1>
-              <p style={styles.horizontalSubtitle}>Explore Song & Extra Material</p>
+              <p style={styles.horizontalSubtitle}>Explore Song &{'\n'}Extra Material</p>
             </div>
           </div>
           
-          <StripColumn flex="1" top="18%" window="50%" bottom="32%" />
+          <StripColumn flex="1" top="15%" window="70%" bottom="15%" />
           
         </div>
       </div>
@@ -248,12 +248,11 @@ const styles = {
   },
   stickyBannerWrapper: {
     position: 'absolute',
-    top: '15%',
+    top: '0', // Pins exactly to top screen edge
     left: '50%',
     transform: 'translateX(-50%)',
-    width: '3.5vw',
-    minWidth: '40px',
-    height: '65%',
+    width: '46px',
+    height: '45vh',
     zIndex: 20,
   },
   blackBanner: {
@@ -262,20 +261,21 @@ const styles = {
     left: 0,
     width: '100%',
     height: '100%',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0a0a0a',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '32px 0 24px 0',
+    justifyContent: 'space-between', // pushes top text and bottom icon apart
+    paddingTop: '36px',
+    paddingBottom: '24px',
     pointerEvents: 'auto',
   },
   verticalBannerText: {
     color: '#ece7df',
     fontFamily: '"Playfair Display", serif',
     writingMode: 'vertical-rl',
-    fontSize: '0.85rem',
-    letterSpacing: '0.05em',
+    fontSize: '13px',
+    letterSpacing: '1px',
     whiteSpace: 'nowrap',
   },
   playButton: {
@@ -291,27 +291,28 @@ const styles = {
     pointerEvents: 'auto',
   },
   titleArea: {
-    width: '180px', // Exact fixed width for title area instead of vw to preserve exact symmetry
+    width: '120px', 
     flexShrink: 0,
     height: '100%',
     background: '#ece7df',
     position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     zIndex: 15,
   },
   titleContainer: {
-    position: 'absolute',
-    top: '45%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    width: '100%',
+    gap: '24px',
+    marginTop: '-40px', // slightly offset vertical center
   },
   verticalTitle: {
     fontFamily: '"Playfair Display", serif',
     writingMode: 'vertical-rl',
-    fontSize: '3.5rem',
+    fontSize: '56px', // fixed big size instead of vw explosion
+    fontWeight: 'normal',
     color: '#1a1a1a',
     margin: 0,
     whiteSpace: 'nowrap',
@@ -319,55 +320,51 @@ const styles = {
   },
   horizontalSubtitle: {
     fontFamily: '"Outfit", sans-serif',
-    fontSize: '12px',
+    fontSize: '10px',
     color: '#1a1a1a',
-    marginTop: '24px', 
     textAlign: 'center',
-    letterSpacing: '0.05em',
+    letterSpacing: '1px',
     textTransform: 'uppercase',
+    whiteSpace: 'pre-wrap',
   },
   leftNav: {
     position: 'absolute',
-    left: '4%',
+    left: '3%',
     top: '50%',
     transform: 'translateY(-50%)',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    gap: '24px', // Space between text and arrow
+    gap: '12px',
     cursor: 'pointer',
     pointerEvents: 'auto',
     zIndex: 50,
   },
   rightNav: {
     position: 'absolute',
-    right: '4%',
+    right: '3%',
     top: '50%',
     transform: 'translateY(-50%)',
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    flexDirection: 'row-reverse', // Put text on the inside, arrow on the outside
-    gap: '24px',
+    gap: '12px',
     cursor: 'pointer',
     pointerEvents: 'auto',
     zIndex: 50,
   },
   navTextContainer: {
-    position: 'relative',
-    width: '100px', // Fixed width to prevent jumping
+    width: '100px',
     display: 'flex',
     justifyContent: 'center',
   },
   navText: {
-    fontFamily: '"Outfit", sans-serif',
+    fontFamily: '"Playfair Display", serif',
     fontSize: '11px',
-    textTransform: 'uppercase',
-    letterSpacing: '2px',
-    color: '#6b6560',
-    maxWidth: '90px',
+    letterSpacing: '1px',
+    color: '#1a1a1a',
     textAlign: 'center',
     lineHeight: 1.4,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
+    whiteSpace: 'pre-wrap',
   },
 };
