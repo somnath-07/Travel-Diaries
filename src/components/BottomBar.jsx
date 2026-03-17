@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
-export default function BottomBar() {
+export default function BottomBar({ hoveredStripIndex }) {
   const [isMuted, setIsMuted] = useState(true);
   const [visualizerActive, setVisualizerActive] = useState(true);
+  const isVisible = hoveredStripIndex !== null;
 
   return (
-    <div style={styles.container}>
+    <div style={{ ...styles.container, opacity: isVisible ? 1 : 0, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)', pointerEvents: isVisible ? 'auto' : 'none' }}>
       {/* Left section: Audio + See All Works */}
       <div style={styles.left}>
         <button

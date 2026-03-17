@@ -6,7 +6,7 @@ import BottomBar from './components/BottomBar';
 import './index.css';
 
 export default function App() {
-  const [hoveredStripIndex, setHoveredStripIndex] = useState(4); // Default to center strip
+  const [hoveredStripIndex, setHoveredStripIndex] = useState(null); // Default to unhovered
 
   return (
     <div style={styles.appContainer}>
@@ -20,7 +20,7 @@ export default function App() {
       </div>
 
       <DynamicTitle hoveredStripIndex={hoveredStripIndex} />
-      <BottomBar />
+      <BottomBar hoveredStripIndex={hoveredStripIndex} />
     </div>
   );
 }

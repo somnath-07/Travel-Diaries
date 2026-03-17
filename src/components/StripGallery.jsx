@@ -15,13 +15,13 @@ const stripsData = [
 
 export default function StripGallery({ hoveredStripIndex, setHoveredStripIndex }) {
   return (
-    <div style={styles.container}>
+    <div style={styles.container} onMouseLeave={() => setHoveredStripIndex(null)}>
       {stripsData.map((strip, index) => (
         <Strip
           key={strip.id}
           strip={strip}
           index={index}
-          isHovered={hoveredStripIndex === index}
+          hoveredStripIndex={hoveredStripIndex}
           onHover={() => setHoveredStripIndex(index)}
         />
       ))}

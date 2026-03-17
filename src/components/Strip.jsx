@@ -1,15 +1,23 @@
 import { useEffect, useRef } from 'react';
 
-export default function Strip({ strip, index, isHovered, onHover }) {
-  const centerIndex = 4;
-  const distFromCenter = Math.abs(index - centerIndex);
-  const heightPercent = isHovered ? 95 : Math.max(60, 90 - distFromCenter * 5);
+export default function Strip({ strip, index, hoveredStripIndex, onHover }) {
+  const isHovered = hoveredStripIndex === index;
+  const isAnyHovered = hoveredStripIndex !== null;
+
+  // Custom undulating heights matching the reference red wave pattern
+  const waveHeights = [85, 75, 60, 75, 85, 65, 55, 75, 85, 75];
+  const baseHeight = waveHeights[index];
+
+  // The hovered strip expands to 95%. If ANY strip is hovered, others compress slightly.
+  const heightPercent = isHovered ? 95 : (isAnyHovered ? baseHeight * 0.9 : baseHeight);
+  
+  // Default state is 50% opacity. If a strip is active, the others dim even further.
+  const stripOpacity = isHovered ? 1 : (isAnyHovered ? 0.35 : 0.5);
+
   const videoRef = useRef(null);
 
-  // Play the video when the strip is hovered, pause when not.
   useEffect(() => {
     if (isHovered && videoRef.current) {
-      // Catch helps absorb abort errors if the user hovers back and forth rapidly
       videoRef.current.play().catch((err) => console.log('Video play interrupted', err));
     } else if (videoRef.current) {
       videoRef.current.pause();
@@ -20,9 +28,9 @@ export default function Strip({ strip, index, isHovered, onHover }) {
     <div
       style={{
         ...styles.stripWrapper,
-        // Fluidly expand hovered strip, compressing siblings gently
         flex: isHovered ? 4 : 1,
         height: `${heightPercent}%`,
+        opacity: stripOpacity,
       }}
       onMouseEnter={onHover}
     >

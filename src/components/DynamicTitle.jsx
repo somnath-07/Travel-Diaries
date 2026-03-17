@@ -37,8 +37,10 @@ export default function DynamicTitle({ hoveredStripIndex }) {
 
   const letters = displayedTitle.split('');
 
+  const isVisible = hoveredStripIndex !== null;
+
   return (
-    <div style={styles.container}>
+    <div style={{ ...styles.container, opacity: isVisible ? 1 : 0, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
       <p style={{
         ...styles.explore,
         opacity: animatingOut ? 0 : 1,
