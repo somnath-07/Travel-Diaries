@@ -1,13 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
-export default function BottomBar({ hoveredStripIndex }) {
+export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode }) {
   const [isMuted, setIsMuted] = useState(true);
-  const [visualizerActive, setVisualizerActive] = useState(true);
-  const isVisible = hoveredStripIndex !== null;
 
   return (
-    <div style={{ ...styles.container, opacity: isVisible ? 1 : 0, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)', pointerEvents: isVisible ? 'auto' : 'none' }}>
+    <div style={{ ...styles.container }}>
       {/* Left section: Audio + See All Works */}
       <div style={styles.left}>
         <button
@@ -19,36 +17,39 @@ export default function BottomBar({ hoveredStripIndex }) {
             ? <VolumeX size={18} color="#1a1a1a" strokeWidth={1.5} />
             : <Volume2 size={18} color="#1a1a1a" strokeWidth={1.5} />}
         </button>
-        <span style={styles.seeAll}>SEE ALL 42 WORKS</span>
+        <span style={styles.seeAll}>26TH MARCH TO 3RD APRIL 2026</span>
       </div>
 
       {/* Center section: Toggle buttons */}
       <div style={styles.center}>
+        {/* Left Toggle (Pill / Minus -> Single View) */}
         <button
           style={{
             ...styles.toggleBtn,
-            backgroundColor: !visualizerActive ? '#1a1a1a' : 'transparent',
+            backgroundColor: viewMode === 'SINGLE' ? '#1a1a1a' : 'transparent',
           }}
-          onClick={() => setVisualizerActive(false)}
-          aria-label="Grid view"
+          onClick={() => setViewMode('SINGLE')}
+          aria-label="Single view"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <circle cx="8" cy="8" r="3" fill={!visualizerActive ? '#ece7df' : '#1a1a1a'} />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="6" y="10" width="12" height="4" rx="2" fill={viewMode === 'SINGLE' ? '#ece7df' : '#1a1a1a'} />
           </svg>
         </button>
+
+        {/* Right Toggle (Equalizer bars -> Grid View / Entire Trip) */}
         <button
           style={{
             ...styles.toggleBtn,
-            backgroundColor: visualizerActive ? '#1a1a1a' : 'transparent',
+            backgroundColor: viewMode === 'GRID' ? '#1a1a1a' : 'transparent',
           }}
-          onClick={() => setVisualizerActive(true)}
-          aria-label="Visualizer view"
+          onClick={() => setViewMode('GRID')}
+          aria-label="Grid view"
         >
-          <svg width="20" height="16" viewBox="0 0 20 16" fill="none">
-            <rect x="2" y="2" width="2" height="12" rx="1" fill={visualizerActive ? '#ece7df' : '#1a1a1a'} />
-            <rect x="6" y="4" width="2" height="8" rx="1" fill={visualizerActive ? '#ece7df' : '#1a1a1a'} />
-            <rect x="10" y="1" width="2" height="14" rx="1" fill={visualizerActive ? '#ece7df' : '#1a1a1a'} />
-            <rect x="14" y="5" width="2" height="6" rx="1" fill={visualizerActive ? '#ece7df' : '#1a1a1a'} />
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <rect x="5.5" y="8" width="2" height="8" rx="1" fill={viewMode === 'GRID' ? '#ece7df' : '#1a1a1a'} />
+            <rect x="9.5" y="6" width="2" height="12" rx="1" fill={viewMode === 'GRID' ? '#ece7df' : '#1a1a1a'} />
+            <rect x="13.5" y="7" width="2" height="10" rx="1" fill={viewMode === 'GRID' ? '#ece7df' : '#1a1a1a'} />
+            <rect x="17.5" y="9" width="2" height="6" rx="1" fill={viewMode === 'GRID' ? '#ece7df' : '#1a1a1a'} />
           </svg>
         </button>
       </div>

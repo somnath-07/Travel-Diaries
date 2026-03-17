@@ -1,53 +1,46 @@
 import { useEffect, useState, useRef } from 'react';
 
-const projectData = [
-  { title: "Pocahontas", song: "Colors of the Wind" },
-  { title: "Aladdin", song: "Speechless" },
-  { title: "Enchanted", song: "That's How You Know" },
-  { title: "Newsies", song: "Seize the Day" },
-  { title: "Hercules", song: "Zero to Hero" },
-  { title: "Beauty", song: "Belle" },
-  { title: "Tangled", song: "I See the Light" },
-  { title: "Mulan", song: "Reflection" },
-  { title: "Tarzan", song: "You'll Be in My Heart" },
-  { title: "The Little Mermaid", song: "Part of Your World" },
-];
+import { projectData } from '../data/projects';
 
 export default function DynamicTitle({ hoveredStripIndex }) {
-  const idx = hoveredStripIndex ?? 4;
-  const { title, song } = projectData[idx];
+  const isHovered = hoveredStripIndex !== null;
+  const currentData = isHovered 
+    ? projectData[hoveredStripIndex] 
+    : { title: "Sikkim Diaries", song: "Curated experience of Sikkim trips" };
 
-  const [displayedTitle, setDisplayedTitle] = useState(title);
-  const [displayedSong, setDisplayedSong] = useState(song);
+  const [displayedTitle, setDisplayedTitle] = useState(currentData.title);
+  const [displayedSong, setDisplayedSong] = useState(currentData.song);
   const [animatingOut, setAnimatingOut] = useState(false);
-  const prevTitle = useRef(title);
+  const prevTitle = useRef(currentData.title);
 
   useEffect(() => {
-    if (title !== prevTitle.current) {
+    if (currentData.title !== prevTitle.current) {
       setAnimatingOut(true);
       const timer = setTimeout(() => {
-        setDisplayedTitle(title);
-        setDisplayedSong(song);
+        setDisplayedTitle(currentData.title);
+        setDisplayedSong(currentData.song);
         setAnimatingOut(false);
-        prevTitle.current = title;
+        prevTitle.current = currentData.title;
       }, 350);
       return () => clearTimeout(timer);
     }
-  }, [title, song]);
+  }, [currentData.title, currentData.song]);
 
   const letters = displayedTitle.split('');
 
   const isVisible = hoveredStripIndex !== null;
 
   return (
-    <div style={{ ...styles.container, opacity: isVisible ? 1 : 0, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-      <p style={{
-        ...styles.explore,
-        opacity: animatingOut ? 0 : 1,
-        transition: 'opacity 0.35s ease',
-      }}>
-        Explore Song &amp; Extra Material
-      </p>
+    <div style={{ ...styles.container, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+      {isHovered && (
+        <p style={{
+          ...styles.explore,
+          opacity: animatingOut ? 0 : 1,
+          transition: 'opacity 0.35s ease',
+        }}>
+          Explore Song &amp; Extra Material
+        </p>
+      )}
 
       <h1 style={styles.titleContainer}>
         {letters.map((char, i) => (
@@ -72,7 +65,7 @@ export default function DynamicTitle({ hoveredStripIndex }) {
         opacity: animatingOut ? 0 : 1,
         transition: 'opacity 0.35s ease',
       }}>
-        Song: {displayedSong}
+        {isHovered ? `Song: ${displayedSong}` : displayedSong}
       </p>
     </div>
   );

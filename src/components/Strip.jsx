@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function Strip({ strip, index, hoveredStripIndex, onHover }) {
+export default function Strip({ strip, index, hoveredStripIndex, onHover, onClick }) {
   const isHovered = hoveredStripIndex === index;
   const isAnyHovered = hoveredStripIndex !== null;
 
@@ -8,31 +8,47 @@ export default function Strip({ strip, index, hoveredStripIndex, onHover }) {
   const waveHeights = [85, 75, 60, 75, 85, 65, 55, 75, 85, 75];
   const baseHeight = waveHeights[index];
 
-  // The hovered strip expands to 95%. If ANY strip is hovered, others compress slightly.
-  const heightPercent = isHovered ? 95 : (isAnyHovered ? baseHeight * 0.9 : baseHeight);
+  // Height stays completely static based on the wave to prevent vertical disturbance
+  const heightPercent = baseHeight;
   
-  // Default state is 50% opacity. If a strip is active, the others dim even further.
   const stripOpacity = isHovered ? 1 : (isAnyHovered ? 0.35 : 0.5);
 
   const videoRef = useRef(null);
+  const hoverAudioRef = useRef(null);
 
   useEffect(() => {
-    if (isHovered && videoRef.current) {
-      videoRef.current.play().catch((err) => console.log('Video play interrupted', err));
-    } else if (videoRef.current) {
-      videoRef.current.pause();
+    if (isHovered) {
+      if (videoRef.current) videoRef.current.play().catch((err) => console.log('Video play interrupted', err));
+      if (hoverAudioRef.current) hoverAudioRef.current.play().catch(e => console.log('Audio blocked:', e));
+    } else {
+      if (videoRef.current) videoRef.current.pause();
+      if (hoverAudioRef.current) {
+        hoverAudioRef.current.pause();
+        hoverAudioRef.current.currentTime = 0; // reset
+      }
     }
   }, [isHovered]);
+
+  const handleFullscreen = (e) => {
+    if (onClick) onClick(e);
+    if (videoRef.current) {
+      if (videoRef.current.requestFullscreen) {
+        videoRef.current.requestFullscreen();
+      } else if (videoRef.current.webkitRequestFullscreen) {
+        videoRef.current.webkitRequestFullscreen();
+      }
+    }
+  };
 
   return (
     <div
       style={{
         ...styles.stripWrapper,
-        flex: isHovered ? 4 : 1,
         height: `${heightPercent}%`,
         opacity: stripOpacity,
       }}
       onMouseEnter={onHover}
+      onClick={handleFullscreen}
     >
       <div
         style={{
@@ -45,6 +61,7 @@ export default function Strip({ strip, index, hoveredStripIndex, onHover }) {
             : '0 4px 20px rgba(0,0,0,0.08)',
         }}
       >
+        <audio ref={hoverAudioRef} src={strip.songAudioUrl} loop preload="auto" />
         <video
           ref={videoRef}
           src={strip.videoUrl}
