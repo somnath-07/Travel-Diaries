@@ -1,5 +1,6 @@
+import React, { useEffect, useRef } from 'react';
+import { TweenMax, Power3 } from 'gsap';
 import Strip from './Strip';
-
 import { projectData } from '../data/projects';
 
 export default function StripGallery({ 
@@ -8,30 +9,37 @@ export default function StripGallery({
   onStripClick,
   isMuted
 }) {
-  // We only allow expansion if a strip is hovered and it's not the absolute edges to avoid harsh layout shifts
+  const stripRefs = useRef([]);
+
+  // GSAP Animation to animate flex-basis dynamically
+  useEffect(() => {
+    stripRefs.current.forEach((el, index) => {
+      if (!el) return;
+      
+      const isHovered = hoveredStripIndex === index;
+      const isImmediateNeighbor = hoveredStripIndex !== null && Math.abs(hoveredStripIndex - index) === 1;
+
+      let targetFlex = '0 0 calc(10% - 10px)'; // default
+      if (hoveredStripIndex !== null) {
+        if (isHovered) targetFlex = '0 0 calc(15% - 10px)';
+        else if (isImmediateNeighbor) targetFlex = '0 0 calc(7.5% - 10px)';
+      }
+
+      TweenMax.to(el, 0.8, {
+        flex: targetFlex,
+        ease: Power3.easeOut
+      });
+    });
+  }, [hoveredStripIndex]);
+
   return (
     <div style={styles.container} onMouseLeave={() => setHoveredStripIndex(null)}>
       {projectData.map((strip, index) => {
-        // Only allow central strips to expand slightly to prevent disturbing the entire row
-        const isHovered = hoveredStripIndex === index;
-        const isImmediateNeighbor = hoveredStripIndex !== null && Math.abs(hoveredStripIndex - index) === 1;
-
-        // Base width calculation to prevent layout thrashing
-        // Active strip gets slightly wider, immediate neighbors slightly narrower. Rest are completely unaffected.
-        let flexShrinkGrow = '0 0 calc(10% - 10px)'; // default
-        
-        if (hoveredStripIndex !== null) {
-          if (isHovered) flexShrinkGrow = '0 0 calc(15% - 10px)';
-          else if (isImmediateNeighbor) flexShrinkGrow = '0 0 calc(7.5% - 10px)';
-        }
-
         return (
           <div 
             key={strip.id} 
-            style={{ 
-              ...styles.stripWrapper, 
-              flex: flexShrinkGrow,
-            }}
+            ref={el => stripRefs.current[index] = el}
+            style={styles.stripWrapper}
           >
             <Strip
               strip={strip}
@@ -62,7 +70,7 @@ const styles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    transition: 'flex 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-    willChange: 'flex', // optimization for smooth width transitions
+    // Removed native CSS flex transition to yield control directly to pure GSAP animation
+    willChange: 'flex', 
   }
 };

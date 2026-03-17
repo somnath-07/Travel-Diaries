@@ -1,20 +1,57 @@
 import React, { useRef, useState, useEffect } from 'react';
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
+import '@videojs/themes/dist/city/index.css';
+import 'lazysizes';
 import { Play } from 'lucide-react';
 
 export default function SingleView({ project, allProjects, activeProjectIndex, setActiveProjectIndex, isMuted }) {
   const videoRef = useRef(null);
   const songAudioRef = useRef(null);
   const containerRef = useRef(null);
+  const playerRef = useRef(null); 
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [isPlayingSong, setIsPlayingSong] = useState(false);
 
-  const handleFullscreen = () => {
-    if (videoRef.current) {
-      if (videoRef.current.requestFullscreen) {
-        videoRef.current.requestFullscreen();
-      } else if (videoRef.current.webkitRequestFullscreen) { /* Safari */
-        videoRef.current.webkitRequestFullscreen();
+  // VideoJS mounting/unmounting
+  useEffect(() => {
+    if (!playerRef.current) {
+      const videoElement = document.createElement("video-js");
+      videoElement.classList.add('vjs-theme-city');
+      videoElement.classList.add('lazyload');
+      videoRef.current.appendChild(videoElement);
+
+      const player = playerRef.current = videojs(videoElement, {
+        autoplay: true,
+        muted: isMuted,
+        loop: true,
+        controls: false,
+        sources: [{
+          src: project.videoUrl,
+          type: 'video/mp4' // Assuming mp4 from source links
+        }]
+      }, () => {
+        videojs.log('player is ready');
+      });
+    } else {
+      const player = playerRef.current;
+      player.muted(isMuted);
+      player.src({ src: project.videoUrl, type: 'video/mp4' });
+    }
+  }, [project.videoUrl, isMuted]);
+
+  useEffect(() => {
+    return () => {
+      if (playerRef.current && !playerRef.current.isDisposed()) {
+        playerRef.current.dispose();
+        playerRef.current = null;
       }
+    };
+  }, []);
+
+  const handleFullscreen = () => {
+    if (playerRef.current) {
+      playerRef.current.requestFullscreen();
     }
   };
 
@@ -71,31 +108,31 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
       onClick={handleVideoClick}
     >
       <audio ref={songAudioRef} src={project.songAudioUrl} loop />
-      <video
-        key={project.videoUrl} // crucial for remounting and autoplaying new sources reliably
-        ref={videoRef}
-        src={project.videoUrl}
+      
+      {/* Container for Video.js player */}
+      <div 
+        ref={videoRef} 
         style={{
           ...styles.video,
           transform: `translate(${mouseOffset.x * -1}px, ${mouseOffset.y * -1}px) scale(1.05)`
         }}
-        autoPlay
-        loop
-        muted={isMuted}
-        playsInline
       />
       
-      {/* Navigation Arrows (placed safely in margins) */}
+      {/* Navigation Arrows (placed safely relative to container, far left/right) */}
       <div style={styles.leftNav} onClick={handlePrev}>
-        <span style={styles.navText}>{prevProject.title.split(',')[0]}</span>
-        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div style={styles.navTextContainer}>
+          <span style={styles.navText}>{prevProject.title.split(',')[0]}</span>
+        </div>
+        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '8px'}}>
           <path d="M10 10L60 10M10 10L16 4M10 10L16 16" stroke="#1a1a1a" strokeWidth="1.5"/>
         </svg>
       </div>
 
       <div style={styles.rightNav} onClick={handleNext}>
-        <span style={styles.navText}>{nextProject.title.split(',')[0]}</span>
-        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div style={styles.navTextContainer}>
+          <span style={styles.navText}>{nextProject.title.split(',')[0]}</span>
+        </div>
+        <svg width="40" height="16" viewBox="0 0 60 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '8px'}}>
           <path d="M0 10L50 10M50 10L44 4M50 10L44 16" stroke="#1a1a1a" strokeWidth="1.5"/>
         </svg>
       </div>
@@ -106,47 +143,48 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
           transform: `translate(${mouseOffset.x * 1}px, ${mouseOffset.y * 1}px) scale(1.02)`
         }}
       >
-        {/* Left spacing (Contains the Left Arrow visually) */}
-        <div style={{ flex: 1, height: '100%', background: '#ece7df' }} />
-        
-        {/* Strip Columns - 16px GAPs & Equal Flex sizing */}
-        <StripColumn flex="2" top="15%" window="60%" bottom="25%" />
-        
-        <div style={{ width: '16px', flexShrink: 0, background: '#ece7df', position: 'relative' }}>
-          {/* STICKY SONG BANNER exactly over the gap */}
-          <div style={styles.stickyBannerWrapper}>
-            <div style={styles.blackBanner}>
-              <span style={styles.verticalBannerText}>{project.song}</span>
-              <button onClick={toggleSong} style={styles.playButton} aria-label={isPlayingSong ? "Pause Song" : "Play Song"}>
-                {isPlayingSong ? (
-                  <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                ) : (
-                  <Play size={10} color="white" fill="white" style={{ marginLeft: 2 }} />
-                )}
-              </button>
+        {/* EXACT CENTERING LAYOUT: 
+            The layout relies on a central flex container that leaves safe margins on left/right for arrows.
+             We use 5 exact equal columns + physical 16px gap dividers.
+        */}
+        <div style={styles.contentWrapper}>
+          
+          <StripColumn flex="1" top="15%" window="60%" bottom="25%" />
+          
+          <div style={styles.gap}>
+             {/* STICKY SONG BANNER absolutely positioned inside the gap to not affect flex widths */}
+            <div style={styles.stickyBannerWrapper}>
+              <div style={styles.blackBanner}>
+                <span style={styles.verticalBannerText}>{project.song}</span>
+                <button onClick={toggleSong} style={styles.playButton} aria-label={isPlayingSong ? "Pause Song" : "Play Song"}>
+                  {isPlayingSong ? (
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                  ) : (
+                    <Play size={10} color="white" fill="white" style={{ marginLeft: 2 }} />
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-        
-        <StripColumn flex="2" top="5%" window="75%" bottom="20%" />
-        <div style={{ width: '16px', flexShrink: 0, background: '#ece7df' }} />
-        
-        <StripColumn flex="2" top="22%" window="50%" bottom="28%" />
-        <div style={{ width: '16px', flexShrink: 0, background: '#ece7df' }} />
-        <StripColumn flex="2" top="12%" window="80%" bottom="8%" />
-        
-        {/* Title Gap */}
-        <div style={styles.titleGap}>
-          <div style={styles.titleContainer}>
-            <h1 style={styles.verticalTitle}>{project.title.split(',')[0]}</h1>
-            <p style={styles.horizontalSubtitle}>Explore Song & Extra Material</p>
+          
+          <StripColumn flex="1" top="5%" window="75%" bottom="20%" />
+          <div style={styles.gap} />
+          
+          <StripColumn flex="1" top="22%" window="50%" bottom="28%" />
+          <div style={styles.gap} />
+          <StripColumn flex="1" top="12%" window="80%" bottom="8%" />
+          
+          {/* Title Area (positioned cleanly away from top nav) */}
+          <div style={styles.titleArea}>
+            <div style={styles.titleContainer}>
+              <h1 style={styles.verticalTitle}>{project.title.split(',')[0]}</h1>
+              <p style={styles.horizontalSubtitle}>Explore Song & Extra Material</p>
+            </div>
           </div>
+          
+          <StripColumn flex="1" top="18%" window="50%" bottom="32%" />
+          
         </div>
-        
-        <StripColumn flex="2" top="18%" window="50%" bottom="32%" />
-        
-        {/* Right Spacing (Contains the Right Arrow visually) */}
-        <div style={{ flex: 1, height: '100%', background: '#ece7df' }} />
       </div>
     </div>
   );
@@ -188,11 +226,25 @@ const styles = {
     position: 'absolute',
     top: 0,
     left: 0,
-    width: '100%',
-    height: '100%',
+    width: '100vw',
+    height: '100vh',
     display: 'flex',
+    justifyContent: 'center', // Center the content wrapper
     zIndex: 12,
-    pointerEvents: 'none', // Let clicks pass through except buttons
+    pointerEvents: 'none',
+  },
+  contentWrapper: {
+    display: 'flex',
+    height: '100%',
+    width: '75%', // Leaves 12.5% margins on each side for the safe arrows
+    position: 'relative',
+  },
+  gap: {
+    width: '16px',
+    flexShrink: 0,
+    height: '100%',
+    background: '#ece7df',
+    position: 'relative',
   },
   stickyBannerWrapper: {
     position: 'absolute',
@@ -238,8 +290,8 @@ const styles = {
     cursor: 'pointer',
     pointerEvents: 'auto',
   },
-  titleGap: {
-    width: '12vw',
+  titleArea: {
+    width: '180px', // Exact fixed width for title area instead of vw to preserve exact symmetry
     flexShrink: 0,
     height: '100%',
     background: '#ece7df',
@@ -276,35 +328,40 @@ const styles = {
   },
   leftNav: {
     position: 'absolute',
-    left: '4vw',
+    left: '4%',
     top: '50%',
     transform: 'translateY(-50%)',
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    gap: '8px',
+    gap: '24px', // Space between text and arrow
     cursor: 'pointer',
     pointerEvents: 'auto',
     zIndex: 50,
   },
   rightNav: {
     position: 'absolute',
-    right: '4vw',
+    right: '4%',
     top: '50%',
     transform: 'translateY(-50%)',
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
-    gap: '8px',
+    flexDirection: 'row-reverse', // Put text on the inside, arrow on the outside
+    gap: '24px',
     cursor: 'pointer',
     pointerEvents: 'auto',
     zIndex: 50,
+  },
+  navTextContainer: {
+    position: 'relative',
+    width: '100px', // Fixed width to prevent jumping
+    display: 'flex',
+    justifyContent: 'center',
   },
   navText: {
     fontFamily: '"Outfit", sans-serif',
     fontSize: '11px',
     textTransform: 'uppercase',
-    letterSpacing: '1px',
+    letterSpacing: '2px',
     color: '#6b6560',
     maxWidth: '90px',
     textAlign: 'center',
