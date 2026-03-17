@@ -11,6 +11,7 @@ export default function App() {
   const [hoveredStripIndex, setHoveredStripIndex] = useState(null); // Default to unhovered
   const [viewMode, setViewMode] = useState('GRID'); // 'GRID' | 'SINGLE'
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
 
   const handleHover = (index) => {
     setHoveredStripIndex(index);
@@ -35,7 +36,7 @@ export default function App() {
 
   return (
     <div style={styles.appContainer}>
-      <audio ref={bgAudioRef} src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3" loop />
+      <audio ref={bgAudioRef} src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3" loop muted={isMuted} />
       <TopNavBar />
 
       {viewMode === 'GRID' ? (
@@ -45,6 +46,7 @@ export default function App() {
               hoveredStripIndex={hoveredStripIndex}
               setHoveredStripIndex={handleHover}
               onStripClick={handleStripClick}
+              isMuted={isMuted}
             />
           </div>
           <DynamicTitle hoveredStripIndex={hoveredStripIndex} />
@@ -55,6 +57,7 @@ export default function App() {
           allProjects={projectData}
           activeProjectIndex={activeProjectIndex}
           setActiveProjectIndex={setActiveProjectIndex}
+          isMuted={isMuted}
         />
       )}
 
@@ -62,6 +65,8 @@ export default function App() {
         hoveredStripIndex={hoveredStripIndex} 
         viewMode={viewMode}
         setViewMode={setViewMode}
+        isMuted={isMuted}
+        setIsMuted={setIsMuted}
       />
     </div>
   );

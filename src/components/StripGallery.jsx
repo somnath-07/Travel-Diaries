@@ -5,7 +5,8 @@ import { projectData } from '../data/projects';
 export default function StripGallery({ 
   hoveredStripIndex, 
   setHoveredStripIndex,
-  onStripClick 
+  onStripClick,
+  isMuted
 }) {
   // We only allow expansion if a strip is hovered and it's not the absolute edges to avoid harsh layout shifts
   return (
@@ -38,6 +39,7 @@ export default function StripGallery({
               hoveredStripIndex={hoveredStripIndex}
               onHover={() => setHoveredStripIndex(index)}
               onClick={() => onStripClick(index)}
+              isMuted={isMuted}
             />
           </div>
         );

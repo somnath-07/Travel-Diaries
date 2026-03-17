@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
-export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode }) {
-  const [isMuted, setIsMuted] = useState(true);
+export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode, isMuted, setIsMuted }) {
 
   return (
     <div style={{ ...styles.container }}>
@@ -74,6 +73,7 @@ const styles = {
     zIndex: 100,
   },
   left: {
+    flex: 1,
     display: 'flex',
     alignItems: 'center',
     gap: '14px',
@@ -97,6 +97,7 @@ const styles = {
   center: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: '6px',
   },
   toggleBtn: {
@@ -111,6 +112,6 @@ const styles = {
     transition: 'background-color 0.3s ease',
   },
   right: {
-    width: '160px', // balance with left section
+    flex: 1, // dynamically perfectly balances the left section to guarantee center
   },
 };

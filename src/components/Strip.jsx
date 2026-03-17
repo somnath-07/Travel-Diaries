@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-export default function Strip({ strip, index, hoveredStripIndex, onHover, onClick }) {
+export default function Strip({ strip, index, hoveredStripIndex, onHover, onClick, isMuted }) {
   const isHovered = hoveredStripIndex === index;
   const isAnyHovered = hoveredStripIndex !== null;
 
@@ -61,14 +61,14 @@ export default function Strip({ strip, index, hoveredStripIndex, onHover, onClic
             : '0 4px 20px rgba(0,0,0,0.08)',
         }}
       >
-        <audio ref={hoverAudioRef} src={strip.songAudioUrl} loop preload="auto" />
+        <audio ref={hoverAudioRef} src={strip.songAudioUrl} loop preload="auto" muted={isMuted} />
         <video
           ref={videoRef}
           src={strip.videoUrl}
           poster={strip.imageUrl}
           style={styles.media}
           loop
-          muted // crucial for autoplay without interaction
+          muted={isMuted} // uses global mute
           playsInline
         />
       </div>
