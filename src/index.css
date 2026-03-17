@@ -1,11 +1,11 @@
 /* src/index.css */
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Outfit:wght@100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400..700&family=Outfit:wght@100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 
 :root {
-  --bg-color: #0d0d0d;
-  --text-color: #f1f1f1;
-  --strip-hover-color: #ffffff;
-  --strip-inactive-color: #999999;
+  --bg-color: #ece7df;
+  --text-color: #1a1a1a;
+  --text-muted: #6b6560;
+  --strip-radius: 20px;
 }
 
 * {
@@ -19,7 +19,7 @@ body {
   font-family: 'Outfit', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
-  overflow: hidden; /* No scrolling allowed */
+  overflow: hidden;
   width: 100vw;
   height: 100vh;
 }
@@ -29,24 +29,30 @@ body {
   height: 100%;
 }
 
+/* ---- Keyframes ---- */
 @keyframes waveIn {
   0% {
     opacity: 0;
-    transform: translateY(20px) scale(0.8);
+    transform: translateY(18px);
   }
   100% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 
 @keyframes fadeOut {
   0% {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
   100% {
     opacity: 0;
-    transform: translateY(-20px) scale(0.8);
+    transform: translateY(-14px);
   }
+}
+
+@keyframes subtlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
 }

@@ -1,65 +1,76 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
+
+const projectData = [
+  { title: "Pocahontas", song: "Colors of the Wind" },
+  { title: "Aladdin", song: "Speechless" },
+  { title: "Enchanted", song: "That's How You Know" },
+  { title: "Newsies", song: "Seize the Day" },
+  { title: "Hercules", song: "Zero to Hero" },
+  { title: "Beauty", song: "Belle" },
+  { title: "Tangled", song: "I See the Light" },
+  { title: "Mulan", song: "Reflection" },
+  { title: "Tarzan", song: "You'll Be in My Heart" },
+  { title: "The Little Mermaid", song: "Part of Your World" },
+];
 
 export default function DynamicTitle({ hoveredStripIndex }) {
-  const titles = [
-    "Pocahontas",
-    "Aladdin",
-    "Hercules",
-    "Beauty and the Beast",
-    "The Little Mermaid",
-    "Tangled",
-    "Mulan",
-    "Tarzan",
-    "The Lion King",
-    "Frozen"
-  ];
+  const idx = hoveredStripIndex ?? 4;
+  const { title, song } = projectData[idx];
 
-  const currentTitle = hoveredStripIndex === null ? titles[0] : titles[hoveredStripIndex];
-  
-  const [displayedTitle, setDisplayedTitle] = useState(currentTitle);
+  const [displayedTitle, setDisplayedTitle] = useState(title);
+  const [displayedSong, setDisplayedSong] = useState(song);
   const [animatingOut, setAnimatingOut] = useState(false);
+  const prevTitle = useRef(title);
 
   useEffect(() => {
-    if (currentTitle !== displayedTitle) {
+    if (title !== prevTitle.current) {
       setAnimatingOut(true);
       const timer = setTimeout(() => {
-        setDisplayedTitle(currentTitle);
+        setDisplayedTitle(title);
+        setDisplayedSong(song);
         setAnimatingOut(false);
-      }, 400); // Wait for fade out
+        prevTitle.current = title;
+      }, 350);
       return () => clearTimeout(timer);
     }
-  }, [currentTitle, displayedTitle]);
+  }, [title, song]);
 
   const letters = displayedTitle.split('');
 
   return (
     <div style={styles.container}>
-      <h1 style={styles.title}>
-        {letters.map((char, i) => {
-          const delay = `${i * 0.05}s`;
-          return (
-            <span
-              key={`${displayedTitle}-${i}`}
-              style={{
-                ...styles.letter,
-                animationDelay: delay,
-                animationName: animatingOut ? 'fadeOut' : 'waveIn',
-                opacity: animatingOut ? 1 : 0, // start invisible if waving in
-                display: char === ' ' ? 'inline-block' : 'inline-block',
-                width: char === ' ' ? '15px' : 'auto',
-              }}
-            >
-              {char}
-            </span>
-          );
-        })}
-      </h1>
       <p style={{
-        ...styles.subtitle,
+        ...styles.explore,
         opacity: animatingOut ? 0 : 1,
-        transition: 'opacity 0.4s ease'
+        transition: 'opacity 0.35s ease',
       }}>
-        Explore the Journey
+        Explore Song &amp; Extra Material
+      </p>
+
+      <h1 style={styles.titleContainer}>
+        {letters.map((char, i) => (
+          <span
+            key={`${displayedTitle}-${i}`}
+            style={{
+              ...styles.letter,
+              animationDelay: `${i * 0.04}s`,
+              animationName: animatingOut ? 'fadeOut' : 'waveIn',
+              opacity: animatingOut ? 1 : 0,
+              display: 'inline-block',
+              width: char === ' ' ? '18px' : 'auto',
+            }}
+          >
+            {char}
+          </span>
+        ))}
+      </h1>
+
+      <p style={{
+        ...styles.songLabel,
+        opacity: animatingOut ? 0 : 1,
+        transition: 'opacity 0.35s ease',
+      }}>
+        Song: {displayedSong}
       </p>
     </div>
   );
@@ -68,33 +79,40 @@ export default function DynamicTitle({ hoveredStripIndex }) {
 const styles = {
   container: {
     position: 'absolute',
-    bottom: '15%',
+    bottom: '60px',
     left: 0,
     right: 0,
     textAlign: 'center',
     zIndex: 10,
     pointerEvents: 'none',
   },
-  title: {
-    fontFamily: '"Dancing Script", cursive',
-    fontSize: '96px',
-    fontWeight: 'normal',
-    color: '#f1f1f1',
-    textShadow: '0 4px 12px rgba(0,0,0,0.5)',
-    margin: 0,
-    letterSpacing: '5px',
-  },
-  subtitle: {
+  explore: {
     fontFamily: '"Outfit", sans-serif',
-    fontSize: '16px',
+    fontSize: '13px',
     textTransform: 'uppercase',
-    letterSpacing: '8px',
-    color: '#rgba(255,255,255,0.7)',
-    marginTop: '20px',
+    letterSpacing: '5px',
+    color: '#6b6560',
+    marginBottom: '8px',
+  },
+  titleContainer: {
+    fontFamily: '"Playfair Display", serif',
+    fontSize: '72px',
+    fontWeight: 400,
+    fontStyle: 'italic',
+    color: '#1a1a1a',
+    margin: '0 0 10px 0',
+    letterSpacing: '2px',
+    lineHeight: 1.1,
   },
   letter: {
-    animationDuration: '0.6s',
+    animationDuration: '0.5s',
     animationFillMode: 'forwards',
     animationTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
-  }
+  },
+  songLabel: {
+    fontFamily: '"Outfit", sans-serif',
+    fontSize: '14px',
+    color: '#6b6560',
+    letterSpacing: '2px',
+  },
 };
