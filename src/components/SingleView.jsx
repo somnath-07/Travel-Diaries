@@ -118,13 +118,13 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
         }}
       />
       
-      {/* Navigation Arrows (Stacked Text over Arrow) */}
+      {/* Navigation Arrows (Stacked Text over Long Elegant Arrow) */}
       <div style={styles.leftNav} onClick={handlePrev}>
         <div style={styles.navTextContainer}>
           <span style={styles.navText}>{prevProject.title.split(',')[0]}</span>
         </div>
-        <svg width="60" height="12" viewBox="0 0 60 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 6H60M0 6L6 0M0 6L6 12" stroke="#1a1a1a" strokeWidth="1"/>
+        <svg width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '4px'}}>
+          <path d="M80 6H0M6 0L0 6L6 12" stroke="#1a1a1a" strokeWidth="1"/>
         </svg>
       </div>
 
@@ -132,8 +132,8 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
         <div style={styles.navTextContainer}>
           <span style={styles.navText}>{nextProject.title.split(',')[0]}</span>
         </div>
-        <svg width="60" height="12" viewBox="0 0 60 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M0 6H60M60 6L54 0M60 6L54 12" stroke="#1a1a1a" strokeWidth="1"/>
+        <svg width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '4px'}}>
+          <path d="M0 6H80M74 0L80 6L74 12" stroke="#1a1a1a" strokeWidth="1"/>
         </svg>
       </div>
 
@@ -145,10 +145,34 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
       >
         <div style={styles.contentWrapper}>
           
-          <StripColumn flex="1" top="10%" window="80%" bottom="10%" />
+          {/* Strip 1 (High) */}
+          <StripColumn flex="1" top="8%" window="84%" bottom="8%" />
+          
+          {/* Title Area Custom Width (Left side in new ref) */}
+          <div style={styles.titleArea}>
+            <div style={styles.titleContainer}>
+              <h1 style={styles.verticalTitle}>
+                {project.title.split(',')[0].replace(' ', '\n')}
+              </h1>
+              <div style={styles.horizontalSubtitleWrapper}>
+                <p style={styles.horizontalSubtitle}>Explore Song &{'\n'}Extra Material</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Strip 2 (Low) */}
+          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
+          <div style={styles.gap} />
+          
+          {/* Strip 3 (Mid) */}
+          <StripColumn flex="1" top="14%" window="72%" bottom="14%" />
+          <div style={styles.gap} />
+          
+          {/* Strip 4 (Low) */}
+          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
           
           <div style={styles.gap}>
-             {/* STICKY SONG BANNER anchored to top of screen */}
+             {/* STICKY SONG BANNER (Right side in new ref) */}
             <div style={styles.stickyBannerWrapper}>
               <div style={styles.blackBanner}>
                 <span style={styles.verticalBannerText}>{project.song}</span>
@@ -163,26 +187,8 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
             </div>
           </div>
           
-          <StripColumn flex="1" top="15%" window="75%" bottom="10%" />
-          <div style={styles.gap} />
-          
-          <StripColumn flex="1" top="5%" window="90%" bottom="5%" />
-          <div style={styles.gap} />
-          
-          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
-          <div style={styles.gap} />
-          
-          <StripColumn flex="1" top="8%" window="82%" bottom="10%" />
-          
-          {/* Title Area */}
-          <div style={styles.titleArea}>
-            <div style={styles.titleContainer}>
-              <h1 style={styles.verticalTitle}>{project.title.split(',')[0]}</h1>
-              <p style={styles.horizontalSubtitle}>Explore Song &{'\n'}Extra Material</p>
-            </div>
-          </div>
-          
-          <StripColumn flex="1" top="15%" window="70%" bottom="15%" />
+          {/* Strip 5 (High) */}
+          <StripColumn flex="1" top="8%" window="84%" bottom="8%" />
           
         </div>
       </div>
@@ -236,11 +242,14 @@ const styles = {
   contentWrapper: {
     display: 'flex',
     height: '100%',
-    width: '75%', // Leaves 12.5% margins on each side for the safe arrows
+    width: '56%', // Reduced from 60% to force even larger outer margins
+    paddingLeft: '6%', // Additional violent push inwards from the left
+    paddingRight: '6%',
     position: 'relative',
+    margin: '0 auto',
   },
   gap: {
-    width: '16px',
+    width: '24px', // At least 16px
     flexShrink: 0,
     height: '100%',
     background: '#ece7df',
@@ -248,11 +257,11 @@ const styles = {
   },
   stickyBannerWrapper: {
     position: 'absolute',
-    top: '0', // Pins exactly to top screen edge
+    top: '8%', // Matches top edge of Strip 1 and 5
     left: '50%',
     transform: 'translateX(-50%)',
-    width: '46px',
-    height: '45vh',
+    width: '50px',
+    height: '35vh',
     zIndex: 20,
   },
   blackBanner: {
@@ -291,7 +300,7 @@ const styles = {
     pointerEvents: 'auto',
   },
   titleArea: {
-    width: '120px', 
+    width: '200px', // Wider area to support dual-line vertical text and match padding
     flexShrink: 0,
     height: '100%',
     background: '#ece7df',
@@ -305,50 +314,55 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '24px',
-    marginTop: '-40px', // slightly offset vertical center
+    justifyContent: 'center',
+    height: '100%',
   },
   verticalTitle: {
     fontFamily: '"Playfair Display", serif',
     writingMode: 'vertical-rl',
-    fontSize: '56px', // fixed big size instead of vw explosion
+    fontSize: '56px',
     fontWeight: 'normal',
-    color: '#1a1a1a',
+    color: '#0a0a0a',
     margin: 0,
-    whiteSpace: 'nowrap',
-    letterSpacing: '1px',
+    letterSpacing: '2px',
+    lineHeight: 1.2,
+  },
+  horizontalSubtitleWrapper: {
+    marginTop: '32px',
+    display: 'flex',
+    justifyContent: 'center',
   },
   horizontalSubtitle: {
     fontFamily: '"Outfit", sans-serif',
-    fontSize: '10px',
-    color: '#1a1a1a',
+    fontSize: '9px', // tiny elegant font matching reference
+    color: '#0a0a0a',
     textAlign: 'center',
     letterSpacing: '1px',
-    textTransform: 'uppercase',
+    lineHeight: '1.4',
     whiteSpace: 'pre-wrap',
   },
   leftNav: {
     position: 'absolute',
-    left: '3%',
+    left: '1.5%', // Pushed slightly closer to edge to increase distance from content
     top: '50%',
     transform: 'translateY(-50%)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '12px',
+    gap: '6px',
     cursor: 'pointer',
     pointerEvents: 'auto',
     zIndex: 50,
   },
   rightNav: {
     position: 'absolute',
-    right: '3%',
+    right: '1.5%',
     top: '50%',
     transform: 'translateY(-50%)',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    gap: '12px',
+    gap: '6px',
     cursor: 'pointer',
     pointerEvents: 'auto',
     zIndex: 50,
