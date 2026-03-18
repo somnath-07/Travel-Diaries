@@ -31,7 +31,7 @@ export default function DynamicTitle({ hoveredStripIndex }) {
   const isVisible = hoveredStripIndex !== null;
 
   return (
-    <div style={{ ...styles.container, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+    <div className="dynamic-title-wrapper" style={{ ...styles.container, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
       {isHovered && (
         <p style={{
           ...styles.explore,
@@ -42,7 +42,7 @@ export default function DynamicTitle({ hoveredStripIndex }) {
         </p>
       )}
 
-      <h1 style={styles.titleContainer}>
+      <h1 className="dynamic-title-text" style={styles.titleContainer}>
         {letters.map((char, i) => (
           <span
             key={`${displayedTitle}-${i}`}
@@ -60,7 +60,7 @@ export default function DynamicTitle({ hoveredStripIndex }) {
         ))}
       </h1>
 
-      <p style={{
+      <p className="dynamic-title-song" style={{
         ...styles.songLabel,
         opacity: animatingOut ? 0 : 1,
         transition: 'opacity 0.35s ease',

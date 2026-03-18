@@ -7,7 +7,8 @@ export default function StripGallery({
   hoveredStripIndex, 
   setHoveredStripIndex,
   onStripClick,
-  isMuted
+  isMuted,
+  setIsMuted
 }) {
   const stripRefs = useRef([]);
 
@@ -33,11 +34,12 @@ export default function StripGallery({
   }, [hoveredStripIndex]);
 
   return (
-    <div style={styles.container} onMouseLeave={() => setHoveredStripIndex(null)}>
+    <div className="strip-gallery-container" style={styles.container} onMouseLeave={() => setHoveredStripIndex(null)}>
       {projectData.map((strip, index) => {
         return (
           <div 
             key={strip.id} 
+            className="strip-wrapper"
             ref={el => stripRefs.current[index] = el}
             style={styles.stripWrapper}
           >
@@ -48,6 +50,7 @@ export default function StripGallery({
               onHover={() => setHoveredStripIndex(index)}
               onClick={() => onStripClick(index)}
               isMuted={isMuted}
+              setIsMuted={setIsMuted}
             />
           </div>
         );

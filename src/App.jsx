@@ -47,6 +47,7 @@ export default function App() {
               setHoveredStripIndex={handleHover}
               onStripClick={handleStripClick}
               isMuted={isMuted}
+              setIsMuted={setIsMuted}
             />
           </div>
           <DynamicTitle hoveredStripIndex={hoveredStripIndex} />
@@ -58,6 +59,8 @@ export default function App() {
           activeProjectIndex={activeProjectIndex}
           setActiveProjectIndex={setActiveProjectIndex}
           isMuted={isMuted}
+          setIsMuted={setIsMuted}
+          onClose={() => setViewMode('GRID')}
         />
       )}
 

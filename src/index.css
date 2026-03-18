@@ -56,3 +56,113 @@ body {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.05); }
 }
+
+/* ---- Mobile Responsiveness ---- */
+@media (max-width: 768px) {
+  /* Navigation Bars */
+  .top-nav, .bottom-bar {
+    padding: 0 20px !important;
+  }
+  .top-nav {
+    height: 60px !important;
+  }
+  .bottom-bar {
+    height: 60px !important;
+  }
+  
+  /* Typography Scaling */
+  .signature-text {
+    font-size: 32px !important;
+  }
+  .see-all-text {
+    font-size: 9px !important;
+    letter-spacing: 1px !important;
+  }
+  .dynamic-title-text {
+    font-size: 40px !important;
+  }
+  .dynamic-title-wrapper {
+    bottom: 40px !important;
+  }
+  
+  /* Single View Cinematic Scaling */
+  .sv-wrapper {
+    width: 85% !important; /* Reclaims space taken by extreme margins on desktop */
+    padding-left: 2% !important;
+    padding-right: 2% !important;
+  }
+  .sv-gap {
+    width: 8px !important; /* Minimized vertical columns gap but retains rhythm */
+  }
+  .sv-title-area {
+    width: 80px !important; /* Compresses title channel width */
+  }
+  .sv-vertical-title {
+    font-size: 34px !important;
+    letter-spacing: 1px !important;
+  }
+  .sv-horizontal-subtitle {
+    font-size: 7px !important;
+    white-space: normal !important;
+  }
+  .sv-banner-wrapper {
+    width: 32px !important;
+    height: 30vh !important;
+  }
+  .sv-banner-text {
+    font-size: 9px !important;
+  }
+  
+  /* Single View Nav Icons Safety Scale */
+  .sv-left-nav {
+    left: 2% !important;
+    transform: scale(0.65) translateY(-50%) !important;
+    transform-origin: left center !important;
+  }
+  .sv-right-nav {
+    right: 2% !important;
+    transform: scale(0.65) translateY(-50%) !important;
+    transform-origin: right center !important;
+  }
+  .sv-nav-text {
+    font-size: 8px !important;
+  }
+  /* Strip Gallery Mobile Safety */
+  .strip-gallery-container {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    justify-content: flex-start !important; /* Allow left-to-right scrolling on small phones instead of center crushing */
+    padding: 0 4% !important; /* Add breathing room to edges */
+  }
+  .strip-wrapper {
+    min-width: 40px !important; /* Physical floor to prevent completely unreadable pixel slivers */
+  }
+}
+
+/* ---- Video Controls ---- */
+/* Fix Video.js background scaling in SingleView */
+.video-js.vjs-theme-city {
+  width: 100% !important;
+  height: 100% !important;
+}
+.video-js .vjs-tech {
+  object-fit: cover !important;
+}
+
+.sv-seek-slider {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  outline: none;
+  height: 2px;
+  cursor: pointer;
+  margin: 0;
+}
+
+.sv-seek-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
+}
+

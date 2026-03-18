@@ -2,12 +2,12 @@ import { Bell, Menu } from 'lucide-react';
 
 export default function TopNavBar() {
   return (
-    <nav style={styles.nav}>
+    <nav className="top-nav" style={styles.nav}>
       <button style={styles.iconButton} aria-label="Notifications">
         <Bell size={22} color="#1a1a1a" strokeWidth={1.5} />
       </button>
 
-      <div style={styles.signature}>
+      <div className="signature-text" style={styles.signature}>
         Somnath
       </div>
 

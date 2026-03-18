@@ -3,15 +3,22 @@ import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 import '@videojs/themes/dist/city/index.css';
 import 'lazysizes';
-import { Play } from 'lucide-react';
+import VideoControls from './VideoControls';
 
-export default function SingleView({ project, allProjects, activeProjectIndex, setActiveProjectIndex, isMuted }) {
+export default function SingleView({ project, allProjects, activeProjectIndex, setActiveProjectIndex, isMuted, setIsMuted, onClose }) {
   const videoRef = useRef(null);
   const songAudioRef = useRef(null);
   const containerRef = useRef(null);
   const playerRef = useRef(null); 
+  const fullscreenContainerRef = useRef(null);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [isPlayingSong, setIsPlayingSong] = useState(false);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
 
   // VideoJS mounting/unmounting
   useEffect(() => {
@@ -32,13 +39,25 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
         }]
       }, () => {
         videojs.log('player is ready');
+        player.on('play', () => setIsPlaying(true));
+        player.on('pause', () => setIsPlaying(false));
+        player.on('timeupdate', () => setCurrentTime(player.currentTime()));
+        player.on('loadedmetadata', () => setDuration(player.duration()));
       });
     } else {
       const player = playerRef.current;
-      player.muted(isMuted);
-      player.src({ src: project.videoUrl, type: 'video/mp4' });
+      if (player.currentSrc() !== project.videoUrl) {
+         player.src({ src: project.videoUrl, type: 'video/mp4' });
+         player.play().catch(e => console.log('Autoplay blocked:', e));
+      }
     }
-  }, [project.videoUrl, isMuted]);
+  }, [project.videoUrl]);
+
+  useEffect(() => {
+    if (playerRef.current) {
+      playerRef.current.muted(isMuted);
+    }
+  }, [isMuted]);
 
   useEffect(() => {
     return () => {
@@ -49,9 +68,26 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
     };
   }, []);
 
+  // Fullscreen tracking
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
   const handleFullscreen = () => {
-    if (playerRef.current) {
-      playerRef.current.requestFullscreen();
+    if (fullscreenContainerRef.current) {
+      if (!document.fullscreenElement) {
+        fullscreenContainerRef.current.requestFullscreen().catch(e => console.log('Fullscreen error:', e));
+      }
+    }
+  };
+
+  const handleExitFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
     }
   };
 
@@ -72,6 +108,40 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
   // Click handler wrapper for video directly
   const handleVideoClick = () => {
     handleFullscreen();
+  };
+
+  const togglePlay = (e) => {
+    e.stopPropagation();
+    if (playerRef.current) {
+      if (isPlaying) {
+        playerRef.current.pause();
+      } else {
+        playerRef.current.play();
+      }
+    }
+  };
+
+  const toggleMute = (e) => {
+    e.stopPropagation();
+    if (setIsMuted) {
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const handleSeek = (e) => {
+    e.stopPropagation();
+    const newTime = parseFloat(e.target.value);
+    setCurrentTime(newTime);
+    if (playerRef.current) {
+      playerRef.current.currentTime(newTime);
+    }
+  };
+
+  const formatTime = (time) => {
+    if (isNaN(time)) return '0:00';
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
   const handleNext = (e) => {
@@ -111,26 +181,43 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
       
       {/* Container for Video.js player */}
       <div 
-        ref={videoRef} 
+        ref={fullscreenContainerRef}
         style={{
           ...styles.video,
           transform: `translate(${mouseOffset.x * -1}px, ${mouseOffset.y * -1}px) scale(1.05)`
         }}
-      />
+      >
+        <div ref={videoRef} style={{ width: '100%', height: '100%' }} />
+        
+        {/* Only show controls when this container is in fullscreen */}
+        {isFullscreen && (
+          <VideoControls 
+            isPlaying={isPlaying}
+            togglePlay={togglePlay}
+            isMuted={isMuted}
+            toggleMute={toggleMute}
+            currentTime={currentTime}
+            duration={duration}
+            handleSeek={handleSeek}
+            formatTime={formatTime}
+            onExitFullscreen={handleExitFullscreen}
+          />
+        )}
+      </div>
       
       {/* Navigation Arrows (Stacked Text over Long Elegant Arrow) */}
-      <div style={styles.leftNav} onClick={handlePrev}>
+      <div className="sv-left-nav" style={styles.leftNav} onClick={handlePrev}>
         <div style={styles.navTextContainer}>
-          <span style={styles.navText}>{prevProject.title.split(',')[0]}</span>
+          <span className="sv-nav-text" style={styles.navText}>{prevProject.title.split(',')[0]}</span>
         </div>
         <svg width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '4px'}}>
           <path d="M80 6H0M6 0L0 6L6 12" stroke="#1a1a1a" strokeWidth="1"/>
         </svg>
       </div>
 
-      <div style={styles.rightNav} onClick={handleNext}>
+      <div className="sv-right-nav" style={styles.rightNav} onClick={handleNext}>
         <div style={styles.navTextContainer}>
-          <span style={styles.navText}>{nextProject.title.split(',')[0]}</span>
+          <span className="sv-nav-text" style={styles.navText}>{nextProject.title.split(',')[0]}</span>
         </div>
         <svg width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '4px'}}>
           <path d="M0 6H80M74 0L80 6L74 12" stroke="#1a1a1a" strokeWidth="1"/>
@@ -143,39 +230,39 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
           transform: `translate(${mouseOffset.x * 1}px, ${mouseOffset.y * 1}px) scale(1.02)`
         }}
       >
-        <div style={styles.contentWrapper}>
+        <div className="sv-wrapper" style={styles.contentWrapper}>
           
           {/* Strip 1 (High) */}
           <StripColumn flex="1" top="8%" window="84%" bottom="8%" />
           
           {/* Title Area Custom Width (Left side in new ref) */}
-          <div style={styles.titleArea}>
+          <div className="sv-title-area" style={styles.titleArea}>
             <div style={styles.titleContainer}>
-              <h1 style={styles.verticalTitle}>
+              <h1 className="sv-vertical-title" style={styles.verticalTitle}>
                 {project.title.split(',')[0].replace(' ', '\n')}
               </h1>
               <div style={styles.horizontalSubtitleWrapper}>
-                <p style={styles.horizontalSubtitle}>Explore Song &{'\n'}Extra Material</p>
+                <p className="sv-horizontal-subtitle" style={styles.horizontalSubtitle}>Explore Song &{'\n'}Extra Material</p>
               </div>
             </div>
           </div>
           
           {/* Strip 2 (Low) */}
           <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
-          <div style={styles.gap} />
+          <div className="sv-gap" style={styles.gap} />
           
           {/* Strip 3 (Mid) */}
           <StripColumn flex="1" top="14%" window="72%" bottom="14%" />
-          <div style={styles.gap} />
+          <div className="sv-gap" style={styles.gap} />
           
           {/* Strip 4 (Low) */}
           <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
           
-          <div style={styles.gap}>
+          <div className="sv-gap" style={styles.gap}>
              {/* STICKY SONG BANNER (Right side in new ref) */}
-            <div style={styles.stickyBannerWrapper}>
+            <div className="sv-banner-wrapper" style={styles.stickyBannerWrapper}>
               <div style={styles.blackBanner}>
-                <span style={styles.verticalBannerText}>{project.song}</span>
+                <span className="sv-banner-text" style={styles.verticalBannerText}>{project.song}</span>
                 <button onClick={toggleSong} style={styles.playButton} aria-label={isPlayingSong ? "Pause Song" : "Play Song"}>
                   {isPlayingSong ? (
                     <svg width="8" height="10" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>

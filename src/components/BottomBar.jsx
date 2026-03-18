@@ -4,7 +4,7 @@ import { Volume2, VolumeX } from 'lucide-react';
 export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode, isMuted, setIsMuted }) {
 
   return (
-    <div style={{ ...styles.container }}>
+    <div className="bottom-bar" style={{ ...styles.container }}>
       {/* Left section: Audio + See All Works */}
       <div style={styles.left}>
         <button
@@ -16,7 +16,7 @@ export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode, is
             ? <VolumeX size={18} color="#1a1a1a" strokeWidth={1.5} />
             : <Volume2 size={18} color="#1a1a1a" strokeWidth={1.5} />}
         </button>
-        <span style={styles.seeAll}>26TH MARCH TO 3RD APRIL 2026</span>
+        <span className="see-all-text" style={styles.seeAll}>26TH MARCH TO 3RD APRIL 2026</span>
       </div>
 
       {/* Center section: Toggle buttons */}
