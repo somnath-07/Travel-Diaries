@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { loaderImages } from '../data/loaderImages';
 
+const BAR_COUNT = 10;
+
 export default function Loader({ onComplete }) {
   const [trail, setTrail] = useState([]);
-  const [isFadingOut, setIsFadingOut] = useState(false);
+  const [isTextFaded, setIsTextFaded] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const lastPosition = useRef({ x: 0, y: 0 });
   const imageIndex = useRef(0);
   const shuffledImagesRef = useRef([]);
@@ -17,26 +20,32 @@ export default function Loader({ onComplete }) {
     }
   }, []);
 
-  // 5-second loader lifetime
+  // 10-second loader lifetime + transition reveal
   useEffect(() => {
-    // Start fading out at 4.2 seconds (takes 800ms)
+    // Start fading out branding text at 9.2 seconds (takes 800ms)
     const fadeTimer = setTimeout(() => {
-      setIsFadingOut(true);
-    }, 4200);
+      setIsTextFaded(true);
+    }, 9200);
 
-    // Call onComplete at 5.0 seconds
+    // Start sliding up the background bars at 10.0 seconds
+    const transitionTimer = setTimeout(() => {
+      setIsTransitioning(true);
+    }, 10000);
+
+    // Call onComplete at 11.8 seconds (after all staggered bars finish sliding up)
     const completeTimer = setTimeout(() => {
       onComplete();
-    }, 5000);
+    }, 11800);
 
     return () => {
       clearTimeout(fadeTimer);
+      clearTimeout(transitionTimer);
       clearTimeout(completeTimer);
     };
   }, [onComplete]);
 
   const handleMouseMove = (e) => {
-    if (isFadingOut || shuffledImagesRef.current.length === 0) return;
+    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
 
     const { clientX, clientY } = e;
     const dx = clientX - lastPosition.current.x;
@@ -65,38 +74,67 @@ export default function Loader({ onComplete }) {
     }
   };
 
+  const bars = Array.from({ length: BAR_COUNT });
+
   return (
     <div
       onMouseMove={handleMouseMove}
       style={{
         ...styles.overlay,
-        opacity: isFadingOut ? 0 : 1,
-        pointerEvents: isFadingOut ? 'none' : 'auto',
+        backgroundColor: isTransitioning ? 'transparent' : '#000000',
+        pointerEvents: isTransitioning ? 'none' : 'auto',
       }}
     >
-      {/* Central Sikkim Diaries Branding */}
-      <div style={styles.centerContainer}>
-        <h1 style={styles.title}>Sikkim Diaries</h1>
-      </div>
+      {/* Background Staggered Bars */}
+      {bars.map((_, index) => {
+        // Stagger from bottom-most (index 9) to top-most (index 0)
+        const reverseIndex = BAR_COUNT - 1 - index;
+        const delay = reverseIndex * 80; // 80ms stagger delay for a super smooth, periodic wave
+        return (
+          <div
+            key={index}
+            style={{
+              ...styles.bar,
+              top: `${index * (100 / BAR_COUNT)}%`,
+              height: `${100 / BAR_COUNT + 0.5}%`, // 0.5% overlap to prevent sub-pixel gaps
+              transitionDelay: `${delay}ms`,
+              transform: isTransitioning ? 'translateY(-101vh)' : 'translateY(0)',
+            }}
+          />
+        );
+      })}
 
-      {/* Mouse Trail Images */}
-      {trail.map((item) => (
-        <img
-          key={item.id}
-          src={item.src}
-          style={{
-            ...styles.trailImg,
-            left: item.x,
-            top: item.y,
-            transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`,
-          }}
-          alt="montage trail"
-        />
-      ))}
+      {/* Main Interactive & Branding Content */}
+      <div
+        style={{
+          ...styles.contentContainer,
+          opacity: isTextFaded ? 0 : 1,
+        }}
+      >
+        {/* Central Sikkim Diaries Branding */}
+        <div style={styles.centerContainer}>
+          <h1 style={styles.title}>Sikkim Diaries</h1>
+        </div>
 
-      {/* Bottom Loading Indicator */}
-      <div style={styles.bottomContainer}>
-        <span style={styles.loadingText}>Loading...</span>
+        {/* Mouse Trail Images */}
+        {trail.map((item) => (
+          <img
+            key={item.id}
+            src={item.src}
+            style={{
+              ...styles.trailImg,
+              left: item.x,
+              top: item.y,
+              transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`,
+            }}
+            alt="montage trail"
+          />
+        ))}
+
+        {/* Bottom Loading Indicator */}
+        <div style={styles.bottomContainer}>
+          <span style={styles.loadingText}>Loading...</span>
+        </div>
       </div>
     </div>
   );
@@ -109,17 +147,33 @@ const styles = {
     left: 0,
     width: '100vw',
     height: '100vh',
-    backgroundColor: '#000000',
     color: '#ece7df',
+    zIndex: 9999,
+    overflow: 'hidden',
+    userSelect: 'none',
+  },
+  contentContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '60px 0',
-    zIndex: 9999,
-    overflow: 'hidden',
+    zIndex: 10,
+    pointerEvents: 'none',
     transition: 'opacity 0.8s ease-in-out',
-    userSelect: 'none',
+  },
+  bar: {
+    position: 'absolute',
+    left: 0,
+    width: '100%',
+    backgroundColor: '#000000',
+    transition: 'transform 0.8s cubic-bezier(0.76, 0, 0.24, 1)',
+    zIndex: 1,
   },
   centerContainer: {
     flex: 1,
