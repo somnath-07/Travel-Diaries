@@ -12,7 +12,7 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
   const playerRef = useRef(null); 
   const fullscreenContainerRef = useRef(null);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
-  const [isPlayingSong, setIsPlayingSong] = useState(false);
+  const [isPlayingSong, setIsPlayingSong] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -70,7 +70,15 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
       playerRef.current.muted(isMuted || !isPlayingSong || !!project.songAudioUrl);
     }
   }, [isMuted, isPlayingSong, project.songAudioUrl]);
-
+  useEffect(() => {
+    if (project.songAudioUrl && songAudioRef.current) {
+      if (isPlaying && isPlayingSong && !isMuted) {
+        songAudioRef.current.play().catch(err => console.log('Audio play blocked:', err));
+      } else {
+        songAudioRef.current.pause();
+      }
+    }
+  }, [isPlaying, isPlayingSong, isMuted, project.songAudioUrl]);
   useEffect(() => {
     return () => {
       if (playerRef.current && !playerRef.current.isDisposed()) {
@@ -118,8 +126,8 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
   };
 
   // Click handler wrapper for video directly
-  const handleVideoClick = () => {
-    handleFullscreen();
+  const handleVideoClick = (e) => {
+    togglePlay(e);
   };
 
   const togglePlay = (e) => {
@@ -291,47 +299,6 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
             <p style={styles.mobileProjectSubtitle}>
               {project.song ? `Song: ${project.song}` : 'Background: Native Sound'}
             </p>
-            
-            {/* Capsule controls */}
-            <div style={styles.mobileControlsContainer}>
-              {/* Play/Pause Button */}
-              <button onClick={togglePlay} style={styles.mobileCapsuleBtn} aria-label={isPlaying ? "Pause Video" : "Play Video"}>
-                {isPlaying ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#1a1a1a">
-                    <rect x="5" y="4" width="4" height="16" rx="1" />
-                    <rect x="15" y="4" width="4" height="16" rx="1" />
-                  </svg>
-                ) : (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#1a1a1a" style={{ marginLeft: '1px' }}>
-                    <path d="M6 4l14 8-14 8z" />
-                  </svg>
-                )}
-              </button>
-
-              {/* Sound Button */}
-              <button 
-                onClick={toggleMute} 
-                style={{
-                  ...styles.mobileCapsuleBtn,
-                  borderColor: isMuted ? '#6b6560' : '#1a1a1a'
-                }} 
-                aria-label="Toggle Sound"
-              >
-                {isMuted ? (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b6560" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-                    <line x1="23" y1="9" x2="17" y2="15" />
-                    <line x1="17" y1="9" x2="23" y2="15" />
-                  </svg>
-                ) : (
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1a1a">
-                    <rect x="4" y="6" width="2" height="12" rx="0.5" />
-                    <rect x="10" y="3" width="2" height="15" rx="0.5" />
-                    <rect x="16" y="8" width="2" height="10" rx="0.5" />
-                  </svg>
-                )}
-              </button>
-            </div>
           </div>
 
           {/* Right Navigation */}

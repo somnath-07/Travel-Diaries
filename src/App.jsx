@@ -12,7 +12,7 @@ export default function App() {
   const [hoveredStripIndex, setHoveredStripIndex] = useState(null); // Default to unhovered
   const [viewMode, setViewMode] = useState('GRID'); // 'GRID' | 'SINGLE'
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(false);
   const [showLoader, setShowLoader] = useState(true);
 
   const handleHover = (index) => {

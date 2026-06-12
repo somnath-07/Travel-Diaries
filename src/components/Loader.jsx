@@ -76,14 +76,18 @@ export default function Loader({ onComplete }) {
 
   const handleTouchStart = (e) => {
     if (isTextFaded || shuffledImagesRef.current.length === 0) return;
-    const touch = e.touches[0];
-    spawnImage(touch.clientX, touch.clientY, true);
+    const touch = e.changedTouches[0] || e.touches[0];
+    if (touch) {
+      spawnImage(touch.clientX, touch.clientY, true);
+    }
   };
 
   const handleTouchMove = (e) => {
     if (isTextFaded || shuffledImagesRef.current.length === 0) return;
-    const touch = e.touches[0];
-    spawnImage(touch.clientX, touch.clientY, false);
+    const touch = e.changedTouches[0] || e.touches[0];
+    if (touch) {
+      spawnImage(touch.clientX, touch.clientY, false);
+    }
   };
 
   const bars = Array.from({ length: BAR_COUNT });
@@ -160,7 +164,7 @@ const styles = {
     top: 0,
     left: 0,
     width: '100vw',
-    height: '100vh',
+    height: '100dvh',
     color: '#ece7df',
     zIndex: 9999,
     overflow: 'hidden',
