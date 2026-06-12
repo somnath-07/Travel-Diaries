@@ -231,19 +231,19 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
         {/* Slats Overlay */}
         <div style={styles.mobileSlatsContainer}>
           {/* Slat 1 */}
-          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
+          <StripColumn flex="1" top="90px" window="24vh" bottom="calc(100% - 90px - 24vh)" />
           <div style={styles.mobileGap} />
           {/* Slat 2 */}
-          <StripColumn flex="1" top="13%" window="74%" bottom="13%" />
+          <StripColumn flex="1" top="70px" window="29vh" bottom="calc(100% - 70px - 29vh)" />
           <div style={styles.mobileGap} />
           {/* Slat 3 */}
-          <StripColumn flex="1" top="6%" window="88%" bottom="6%" />
+          <StripColumn flex="1" top="50px" window="34vh" bottom="calc(100% - 50px - 34vh)" />
           <div style={styles.mobileGap} />
           {/* Slat 4 */}
-          <StripColumn flex="1" top="13%" window="74%" bottom="13%" />
+          <StripColumn flex="1" top="70px" window="29vh" bottom="calc(100% - 70px - 29vh)" />
           <div style={styles.mobileGap} />
           {/* Slat 5 */}
-          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
+          <StripColumn flex="1" top="90px" window="24vh" bottom="calc(100% - 90px - 24vh)" />
 
           {/* Sticky Song Banner on Mobile */}
           <div style={styles.mobileSongBannerWrapper}>
@@ -652,10 +652,10 @@ const styles = {
   },
   mobileSlatsContainer: {
     position: 'absolute',
-    top: '90px',
+    top: 0,
     left: '4vw',
     width: '92vw',
-    height: '42vh',
+    height: '100vh',
     display: 'flex',
     zIndex: 12,
     pointerEvents: 'none',
@@ -668,7 +668,7 @@ const styles = {
   },
   mobileSongBannerWrapper: {
     position: 'absolute',
-    top: '6%',
+    top: '70px',
     right: '6%',
     width: '40px',
     height: '20vh',

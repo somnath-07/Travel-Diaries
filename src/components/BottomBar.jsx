@@ -2,11 +2,21 @@ import { useState, useRef, useEffect } from 'react';
 import { Volume2, VolumeX } from 'lucide-react';
 
 export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode, isMuted, setIsMuted }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
-    <div className="bottom-bar" style={{ ...styles.container }}>
+    <div className="bottom-bar" style={{ ...styles.container, padding: isMobile ? '0 24px' : '0 40px' }}>
       {/* Left section: Audio + See All Works */}
-      <div style={styles.left}>
+      <div style={{ ...styles.left, gap: isMobile ? '8px' : '14px' }}>
         <button
           style={styles.audioButton}
           onClick={() => setIsMuted(!isMuted)}
