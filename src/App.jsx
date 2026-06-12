@@ -40,6 +40,8 @@ export default function App() {
               onStripClick={handleStripClick}
               isMuted={isMuted}
               setIsMuted={setIsMuted}
+              activeProjectIndex={activeProjectIndex}
+              setActiveProjectIndex={setActiveProjectIndex}
             />
           </div>
           <DynamicTitle hoveredStripIndex={hoveredStripIndex} />

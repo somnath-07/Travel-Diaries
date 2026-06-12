@@ -13,6 +13,16 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
   const fullscreenContainerRef = useRef(null);
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 });
   const [isPlayingSong, setIsPlayingSong] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
@@ -186,6 +196,142 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
 
   const nextProject = allProjects[(activeProjectIndex + 1) % allProjects.length];
   const prevProject = allProjects[(activeProjectIndex - 1 + allProjects.length) % allProjects.length];
+
+  if (isMobile) {
+    return (
+      <div 
+        ref={containerRef} 
+        style={styles.mobileContainer} 
+        onClick={handleVideoClick}
+      >
+        <audio ref={songAudioRef} src={project.songAudioUrl} loop muted={isMuted} />
+        
+        {/* Fullscreen Video.js wrapper */}
+        <div 
+          ref={fullscreenContainerRef}
+          style={styles.mobileVideo}
+        >
+          <div ref={videoRef} style={{ width: '100%', height: '100%' }} />
+          
+          {isFullscreen && (
+            <VideoControls 
+              isPlaying={isPlaying}
+              togglePlay={togglePlay}
+              isMuted={isMuted}
+              toggleMute={toggleMute}
+              currentTime={currentTime}
+              duration={duration}
+              handleSeek={handleSeek}
+              formatTime={formatTime}
+              onExitFullscreen={handleExitFullscreen}
+            />
+          )}
+        </div>
+
+        {/* Slats Overlay */}
+        <div style={styles.mobileSlatsContainer}>
+          {/* Slat 1 */}
+          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
+          <div style={styles.mobileGap} />
+          {/* Slat 2 */}
+          <StripColumn flex="1" top="13%" window="74%" bottom="13%" />
+          <div style={styles.mobileGap} />
+          {/* Slat 3 */}
+          <StripColumn flex="1" top="6%" window="88%" bottom="6%" />
+          <div style={styles.mobileGap} />
+          {/* Slat 4 */}
+          <StripColumn flex="1" top="13%" window="74%" bottom="13%" />
+          <div style={styles.mobileGap} />
+          {/* Slat 5 */}
+          <StripColumn flex="1" top="20%" window="60%" bottom="20%" />
+
+          {/* Sticky Song Banner on Mobile */}
+          <div style={styles.mobileSongBannerWrapper}>
+            <div style={styles.mobileBlackBanner}>
+              <span style={styles.mobileVerticalBannerText}>{project.song || 'Sikkim'}</span>
+              <button onClick={toggleSong} style={styles.mobilePlayButton} aria-label={isPlayingSong ? "Pause Song" : "Play Song"}>
+                {isPlayingSong ? (
+                  <svg width="8" height="8" viewBox="0 0 24 24" fill="white"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                ) : (
+                  <svg width="8" height="10" viewBox="0 0 24 24" fill="white"><path d="M5 3l14 9-14 9v-18z"/></svg>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom details, controls & navigation */}
+        <div style={styles.mobileBottomSection}>
+          
+          {/* Left Navigation */}
+          <div style={styles.mobileLeftNav} onClick={handlePrev}>
+            <span style={styles.mobileNavTitle}>{prevProject.title.split(',')[0]}</span>
+            <svg width="45" height="10" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={styles.mobileArrow}>
+              <path d="M80 6H0M6 0L0 6L6 12" stroke="#1a1a1a" strokeWidth="1.5"/>
+            </svg>
+          </div>
+
+          {/* Center Title and Media Controls */}
+          <div style={styles.mobileCenterInfo}>
+            <h2 style={styles.mobileProjectTitle}>{project.title.split(',')[0]}</h2>
+            <p style={styles.mobileProjectSubtitle}>
+              {project.song ? `Song: ${project.song}` : 'Background: Native Sound'}
+            </p>
+            
+            {/* Capsule controls */}
+            <div style={styles.mobileControlsContainer}>
+              {/* Play/Pause Button */}
+              <button onClick={togglePlay} style={styles.mobileCapsuleBtn} aria-label={isPlaying ? "Pause Video" : "Play Video"}>
+                {isPlaying ? (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#1a1a1a">
+                    <rect x="5" y="4" width="4" height="16" rx="1" />
+                    <rect x="15" y="4" width="4" height="16" rx="1" />
+                  </svg>
+                ) : (
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#1a1a1a" style={{ marginLeft: '1px' }}>
+                    <path d="M6 4l14 8-14 8z" />
+                  </svg>
+                )}
+              </button>
+
+              {/* Sound Button */}
+              <button 
+                onClick={toggleMute} 
+                style={{
+                  ...styles.mobileCapsuleBtn,
+                  borderColor: isMuted ? '#6b6560' : '#1a1a1a'
+                }} 
+                aria-label="Toggle Sound"
+              >
+                {isMuted ? (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b6560" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                    <line x1="23" y1="9" x2="17" y2="15" />
+                    <line x1="17" y1="9" x2="23" y2="15" />
+                  </svg>
+                ) : (
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1a1a">
+                    <rect x="4" y="6" width="2" height="12" rx="0.5" />
+                    <rect x="10" y="3" width="2" height="15" rx="0.5" />
+                    <rect x="16" y="8" width="2" height="10" rx="0.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          {/* Right Navigation */}
+          <div style={styles.mobileRightNav} onClick={handleNext}>
+            <span style={styles.mobileNavTitle}>{nextProject.title.split(',')[0]}</span>
+            <svg width="45" height="10" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={styles.mobileArrow}>
+              <path d="M0 6H80M74 0L80 6L74 12" stroke="#1a1a1a" strokeWidth="1.5"/>
+            </svg>
+          </div>
+
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -484,5 +630,172 @@ const styles = {
     textAlign: 'center',
     lineHeight: 1.4,
     whiteSpace: 'pre-wrap',
+  },
+  mobileContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    overflow: 'hidden',
+    zIndex: 10,
+    backgroundColor: '#ece7df',
+  },
+  mobileVideo: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    objectFit: 'cover',
+    zIndex: 11,
+  },
+  mobileSlatsContainer: {
+    position: 'absolute',
+    top: '90px',
+    left: '4vw',
+    width: '92vw',
+    height: '42vh',
+    display: 'flex',
+    zIndex: 12,
+    pointerEvents: 'none',
+  },
+  mobileGap: {
+    width: '5px',
+    flexShrink: 0,
+    height: '100%',
+    background: '#ece7df',
+  },
+  mobileSongBannerWrapper: {
+    position: 'absolute',
+    top: '6%',
+    right: '6%',
+    width: '40px',
+    height: '20vh',
+    zIndex: 20,
+  },
+  mobileBlackBanner: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#0a0a0a',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: '20px',
+    paddingBottom: '12px',
+    pointerEvents: 'auto',
+  },
+  mobileVerticalBannerText: {
+    color: '#ece7df',
+    fontFamily: '"Playfair Display", serif',
+    writingMode: 'vertical-rl',
+    fontSize: '11px',
+    letterSpacing: '1px',
+    whiteSpace: 'nowrap',
+  },
+  mobilePlayButton: {
+    width: '24px',
+    height: '24px',
+    borderRadius: '50%',
+    border: '1px solid #ece7df',
+    background: 'transparent',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    pointerEvents: 'auto',
+  },
+  mobileBottomSection: {
+    position: 'absolute',
+    bottom: '60px',
+    left: '4vw',
+    width: '92vw',
+    height: '24vh',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    zIndex: 15,
+  },
+  mobileLeftNav: {
+    width: '28%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    cursor: 'pointer',
+    gap: '6px',
+    pointerEvents: 'auto',
+  },
+  mobileRightNav: {
+    width: '28%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-end',
+    cursor: 'pointer',
+    gap: '6px',
+    pointerEvents: 'auto',
+  },
+  mobileNavTitle: {
+    fontFamily: '"Playfair Display", serif',
+    fontSize: '10px',
+    color: '#1a1a1a',
+    textAlign: 'center',
+    lineHeight: 1.3,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    width: '100%',
+  },
+  mobileArrow: {
+    display: 'block',
+  },
+  mobileCenterInfo: {
+    width: '44%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mobileProjectTitle: {
+    fontFamily: '"Playfair Display", serif',
+    fontSize: '20px',
+    fontWeight: 'normal',
+    color: '#1a1a1a',
+    margin: '0 0 4px 0',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
+  mobileProjectSubtitle: {
+    fontFamily: '"Outfit", sans-serif',
+    fontSize: '9px',
+    fontWeight: 500,
+    letterSpacing: '1px',
+    color: '#6b6560',
+    textTransform: 'uppercase',
+    margin: 0,
+    textAlign: 'center',
+  },
+  mobileControlsContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '12px',
+    marginTop: '12px',
+    pointerEvents: 'auto',
+  },
+  mobileCapsuleBtn: {
+    width: '34px',
+    height: '34px',
+    borderRadius: '50%',
+    border: '1.5px solid #1a1a1a',
+    backgroundColor: 'transparent',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer',
+    outline: 'none',
   },
 };

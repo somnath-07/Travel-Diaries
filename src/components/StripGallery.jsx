@@ -1,6 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TweenMax, Power3 } from 'gsap';
 import Strip from './Strip';
+import MobileStripGallery from './MobileStripGallery';
 import { projectData } from '../data/projects';
 
 export default function StripGallery({ 
@@ -8,8 +9,21 @@ export default function StripGallery({
   setHoveredStripIndex,
   onStripClick,
   isMuted,
-  setIsMuted
+  setIsMuted,
+  activeProjectIndex,
+  setActiveProjectIndex
 }) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   const stripRefs = useRef([]);
 
   // GSAP Animation to animate flex-basis dynamically
@@ -32,6 +46,18 @@ export default function StripGallery({
       });
     });
   }, [hoveredStripIndex]);
+
+  if (isMobile) {
+    return (
+      <MobileStripGallery
+        activeProjectIndex={activeProjectIndex}
+        setActiveProjectIndex={setActiveProjectIndex}
+        isMuted={isMuted}
+        setIsMuted={setIsMuted}
+        onStripClick={onStripClick}
+      />
+    );
+  }
 
   return (
     <div className="strip-gallery-container" style={styles.container} onMouseLeave={() => setHoveredStripIndex(null)}>
