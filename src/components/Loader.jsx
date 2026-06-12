@@ -69,34 +69,43 @@ export default function Loader({ onComplete }) {
     }
   };
 
-  const handleMouseMove = (e) => {
-    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
-    spawnImage(e.clientX, e.clientY, false);
-  };
+  useEffect(() => {
+    const handleTouchStartWindow = (e) => {
+      if (isTextFaded || shuffledImagesRef.current.length === 0) return;
+      const touch = e.changedTouches[0] || e.touches[0];
+      if (touch) {
+        spawnImage(touch.clientX, touch.clientY, true);
+      }
+    };
 
-  const handleTouchStart = (e) => {
-    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
-    const touch = e.changedTouches[0] || e.touches[0];
-    if (touch) {
-      spawnImage(touch.clientX, touch.clientY, true);
-    }
-  };
+    const handleTouchMoveWindow = (e) => {
+      if (isTextFaded || shuffledImagesRef.current.length === 0) return;
+      const touch = e.changedTouches[0] || e.touches[0];
+      if (touch) {
+        spawnImage(touch.clientX, touch.clientY, false);
+      }
+    };
 
-  const handleTouchMove = (e) => {
-    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
-    const touch = e.changedTouches[0] || e.touches[0];
-    if (touch) {
-      spawnImage(touch.clientX, touch.clientY, false);
-    }
-  };
+    const handleMouseMoveWindow = (e) => {
+      if (isTextFaded || shuffledImagesRef.current.length === 0) return;
+      spawnImage(e.clientX, e.clientY, false);
+    };
+
+    window.addEventListener('touchstart', handleTouchStartWindow, { passive: true });
+    window.addEventListener('touchmove', handleTouchMoveWindow, { passive: true });
+    window.addEventListener('mousemove', handleMouseMoveWindow);
+
+    return () => {
+      window.removeEventListener('touchstart', handleTouchStartWindow);
+      window.removeEventListener('touchmove', handleTouchMoveWindow);
+      window.removeEventListener('mousemove', handleMouseMoveWindow);
+    };
+  }, [isTextFaded]);
 
   const bars = Array.from({ length: BAR_COUNT });
 
   return (
     <div
-      onMouseMove={handleMouseMove}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
       style={{
         ...styles.overlay,
         backgroundColor: isTransitioning ? 'transparent' : '#000000',

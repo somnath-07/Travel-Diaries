@@ -12,7 +12,7 @@ export default function App() {
   const [hoveredStripIndex, setHoveredStripIndex] = useState(null); // Default to unhovered
   const [viewMode, setViewMode] = useState('GRID'); // 'GRID' | 'SINGLE'
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [showLoader, setShowLoader] = useState(true);
 
   const handleHover = (index) => {
@@ -28,7 +28,14 @@ export default function App() {
 
   return (
     <div style={styles.appContainer}>
-      {showLoader && <Loader onComplete={() => setShowLoader(false)} />}
+      {showLoader && (
+        <Loader 
+          onComplete={() => {
+            setShowLoader(false);
+            setIsMuted(false);
+          }} 
+        />
+      )}
       <TopNavBar />
 
       {viewMode === 'GRID' ? (
