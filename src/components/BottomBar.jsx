@@ -35,6 +35,7 @@ export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode, is
         <button
           style={{
             ...styles.toggleBtn,
+            borderColor: isMobile ? '#ece7df' : '#1a1a1a',
             backgroundColor: viewMode === 'SINGLE' ? '#1a1a1a' : 'transparent',
           }}
           onClick={() => setViewMode('SINGLE')}
@@ -49,6 +50,7 @@ export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode, is
         <button
           style={{
             ...styles.toggleBtn,
+            borderColor: isMobile ? '#ece7df' : '#1a1a1a',
             backgroundColor: viewMode === 'GRID' ? '#1a1a1a' : 'transparent',
           }}
           onClick={() => setViewMode('GRID')}

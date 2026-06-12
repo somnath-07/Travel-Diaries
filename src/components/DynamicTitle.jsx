@@ -13,6 +13,17 @@ export default function DynamicTitle({ hoveredStripIndex }) {
   const [animatingOut, setAnimatingOut] = useState(false);
   const prevTitle = useRef(currentData.title);
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   useEffect(() => {
     if (currentData.title !== prevTitle.current) {
       setAnimatingOut(true);
@@ -31,8 +42,12 @@ export default function DynamicTitle({ hoveredStripIndex }) {
   const isVisible = hoveredStripIndex !== null;
 
   return (
-    <div className="dynamic-title-wrapper" style={{ ...styles.container, transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)' }}>
-      {isHovered && (
+    <div className="dynamic-title-wrapper" style={{ 
+      ...styles.container, 
+      bottom: isMobile ? '65px' : '60px',
+      transition: 'opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1)' 
+    }}>
+      {isHovered && !isMobile && (
         <p style={{
           ...styles.explore,
           opacity: animatingOut ? 0 : 1,
@@ -42,7 +57,11 @@ export default function DynamicTitle({ hoveredStripIndex }) {
         </p>
       )}
 
-      <h1 className="dynamic-title-text" style={styles.titleContainer}>
+      <h1 className="dynamic-title-text" style={{
+        ...styles.titleContainer,
+        fontSize: isMobile ? '34px' : '72px',
+        margin: isMobile ? '0 0 4px 0' : '0 0 10px 0',
+      }}>
         {letters.map((char, i) => (
           <span
             key={`${displayedTitle}-${i}`}
@@ -52,7 +71,7 @@ export default function DynamicTitle({ hoveredStripIndex }) {
               animationName: animatingOut ? 'fadeOut' : 'waveIn',
               opacity: animatingOut ? 1 : 0,
               display: 'inline-block',
-              width: char === ' ' ? '18px' : 'auto',
+              width: char === ' ' ? (isMobile ? '8px' : '18px') : 'auto',
             }}
           >
             {char}
@@ -62,6 +81,7 @@ export default function DynamicTitle({ hoveredStripIndex }) {
 
       <p className="dynamic-title-song" style={{
         ...styles.songLabel,
+        fontSize: isMobile ? '10px' : '14px',
         opacity: animatingOut ? 0 : 1,
         transition: 'opacity 0.35s ease',
       }}>

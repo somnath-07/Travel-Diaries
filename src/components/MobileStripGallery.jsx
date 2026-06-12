@@ -140,60 +140,6 @@ export default function MobileStripGallery({
           );
         })}
       </div>
-
-      {/* active card details */}
-      <div style={styles.detailsContainer}>
-        <h2 style={styles.activeTitle}>{activeProject.title.split(',')[0]}</h2>
-        <p style={styles.activeSubtitle}>
-          {activeProject.song ? `Song: ${activeProject.song}` : 'Background: Native Sound'}
-        </p>
-      </div>
-
-      {/* bottom capsule controls */}
-      <div style={styles.controlsContainer}>
-        {/* Play/Pause Button */}
-        <button
-          onClick={() => setIsPlaying((prev) => !prev)}
-          style={styles.capsuleBtn}
-          aria-label={isPlaying ? 'Pause Video' : 'Play Video'}
-        >
-          {isPlaying ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1a1a">
-              <rect x="5" y="4" width="4" height="16" rx="1" />
-              <rect x="15" y="4" width="4" height="16" rx="1" />
-            </svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1a1a" style={{ marginLeft: '2px' }}>
-              <path d="M6 4l14 8-14 8z" />
-            </svg>
-          )}
-        </button>
-
-        {/* Sound Button */}
-        <button
-          onClick={() => setIsMuted(!isMuted)}
-          style={{
-            ...styles.capsuleBtn,
-            borderColor: isMuted ? '#6b6560' : '#1a1a1a',
-          }}
-          aria-label="Toggle Sound"
-        >
-          {isMuted ? (
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6b6560" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
-              <line x1="23" y1="9" x2="17" y2="15" />
-              <line x1="17" y1="9" x2="23" y2="15" />
-            </svg>
-          ) : (
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#1a1a1a">
-              {/* Equalizer Bars */}
-              <rect x="4" y="6" width="2.5" height="12" rx="1" />
-              <rect x="10" y="3" width="2.5" height="15" rx="1" />
-              <rect x="16" y="8" width="2.5" height="10" rx="1" />
-            </svg>
-          )}
-        </button>
-      </div>
     </div>
   );
 }
@@ -251,8 +197,8 @@ const styles = {
   sliderWrapper: {
     position: 'relative',
     width: '100%',
-    height: '44vh',
-    marginTop: '15px',
+    height: '40vh',
+    marginTop: '5px',
     overflow: 'visible',
   },
   cardWrapper: {
@@ -274,7 +220,7 @@ const styles = {
     display: 'block',
   },
   detailsContainer: {
-    marginTop: '25px',
+    marginTop: '12px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -284,14 +230,14 @@ const styles = {
   },
   activeTitle: {
     fontFamily: '"Playfair Display", serif',
-    fontSize: '24px',
+    fontSize: '20px',
     fontWeight: 'normal',
     color: '#1a1a1a',
-    margin: '0 0 6px 0',
+    margin: '0 0 3px 0',
   },
   activeSubtitle: {
     fontFamily: '"Outfit", sans-serif',
-    fontSize: '11px',
+    fontSize: '9px',
     fontWeight: 500,
     letterSpacing: '1px',
     color: '#6b6560',
@@ -303,11 +249,11 @@ const styles = {
     alignItems: 'center',
     justifyContent: 'center',
     gap: '12px',
-    marginTop: '20px',
+    marginTop: '10px',
   },
   capsuleBtn: {
-    width: '38px',
-    height: '38px',
+    width: '32px',
+    height: '32px',
     borderRadius: '50%',
     border: '1.5px solid #1a1a1a',
     backgroundColor: 'transparent',

@@ -72,7 +72,7 @@ export default function App() {
 const styles = {
   appContainer: {
     width: '100vw',
-    height: '100vh',
+    height: '100dvh',
     position: 'relative',
     overflow: 'hidden',
     backgroundColor: '#ece7df',

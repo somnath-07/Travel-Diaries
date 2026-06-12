@@ -238,16 +238,12 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
 
           {/* Slat 1 */}
           <MobileSlatColumn topSpacerVh={6} windowHeightVh={22} />
-          <div style={styles.mobileGap} />
           {/* Slat 2 */}
           <MobileSlatColumn topSpacerVh={3} windowHeightVh={27} />
-          <div style={styles.mobileGap} />
           {/* Slat 3 */}
           <MobileSlatColumn topSpacerVh={0} windowHeightVh={32} />
-          <div style={styles.mobileGap} />
           {/* Slat 4 */}
           <MobileSlatColumn topSpacerVh={3} windowHeightVh={27} />
-          <div style={styles.mobileGap} />
           {/* Slat 5 */}
           <MobileSlatColumn topSpacerVh={6} windowHeightVh={22} />
 
@@ -472,7 +468,7 @@ function StripColumn({ flex, top, window, bottom, children }) {
 
 function MobileSlatColumn({ topSpacerVh, windowHeightVh }) {
   return (
-    <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', marginLeft: '-2px' }}>
       <div style={{ height: `${topSpacerVh}vh`, backgroundColor: '#ece7df' }} />
       <div style={{ height: `${windowHeightVh}vh`, backgroundColor: 'transparent' }} />
       <div style={{ flex: 1, backgroundColor: '#ece7df' }} />
@@ -718,6 +714,7 @@ const styles = {
     width: '6vw',
     height: '100%',
     backgroundColor: '#ece7df',
+    marginLeft: '-2px',
   },
   mobileBlackBanner: {
     position: 'absolute',
@@ -835,7 +832,7 @@ const styles = {
     width: '34px',
     height: '34px',
     borderRadius: '50%',
-    border: '1.5px solid #1a1a1a',
+    border: '1.5px solid #ece7df',
     backgroundColor: 'transparent',
     display: 'flex',
     alignItems: 'center',
