@@ -44,22 +44,18 @@ export default function Loader({ onComplete }) {
     };
   }, [onComplete]);
 
-  const handleMouseMove = (e) => {
-    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
-
-    const { clientX, clientY } = e;
+  const spawnImage = (clientX, clientY, force = false) => {
     const dx = clientX - lastPosition.current.x;
     const dy = clientY - lastPosition.current.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    // Only spawn a new image if mouse has moved more than 45 pixels
-    if (distance > 45) {
+    if (force || distance > 45) {
       const newItem = {
         id: Date.now() + Math.random(),
         x: clientX,
         y: clientY,
         src: shuffledImagesRef.current[imageIndex.current],
-        rotation: (Math.random() - 0.5) * 20, // Random rotation -10 to 10 deg
+        rotation: (Math.random() - 0.5) * 20,
       };
 
       imageIndex.current = (imageIndex.current + 1) % shuffledImagesRef.current.length;
@@ -67,11 +63,27 @@ export default function Loader({ onComplete }) {
 
       setTrail((prev) => [...prev, newItem]);
 
-      // Remove trail image after 800ms
       setTimeout(() => {
         setTrail((prev) => prev.filter((item) => item.id !== newItem.id));
       }, 800);
     }
+  };
+
+  const handleMouseMove = (e) => {
+    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
+    spawnImage(e.clientX, e.clientY, false);
+  };
+
+  const handleTouchStart = (e) => {
+    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
+    const touch = e.touches[0];
+    spawnImage(touch.clientX, touch.clientY, true);
+  };
+
+  const handleTouchMove = (e) => {
+    if (isTextFaded || shuffledImagesRef.current.length === 0) return;
+    const touch = e.touches[0];
+    spawnImage(touch.clientX, touch.clientY, false);
   };
 
   const bars = Array.from({ length: BAR_COUNT });
@@ -79,6 +91,8 @@ export default function Loader({ onComplete }) {
   return (
     <div
       onMouseMove={handleMouseMove}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
       style={{
         ...styles.overlay,
         backgroundColor: isTransitioning ? 'transparent' : '#000000',

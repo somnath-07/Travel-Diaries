@@ -94,15 +94,24 @@ export default function MobileStripGallery({
         {projectData.map((project, index) => {
           const offset = getCyclicOffset(index, activeProjectIndex, projectData.length);
           const isCenter = index === activeProjectIndex;
-          const isNeighbor = Math.abs(offset) === 1;
 
           // Only render visible items to save performance
           if (Math.abs(offset) > 1) return null;
 
-          const translateX = offset * 60; // 60vw column gap
-          const scale = isCenter ? 1.0 : 0.82;
-          const opacity = isCenter ? 1.0 : 0.45;
-          const filter = isCenter ? 'none' : 'grayscale(100%) sepia(30%) brightness(0.7)';
+          const colWidth = window.innerWidth * 0.6; // 60vw in pixels
+          const translateX_px = offset * colWidth;
+          const totalTranslation = translateX_px + dragOffset;
+          const t = Math.min(1, Math.max(0, Math.abs(totalTranslation) / colWidth));
+
+          // Interpolated values based on distance from center
+          const scale = 1.0 - t * 0.18; // center is 1.0, neighbor is 0.82
+          const opacity = 1.0 - t * 0.55; // center is 1.0, neighbor is 0.45
+          const grayscaleVal = t * 100;
+          const sepiaVal = t * 30;
+          const brightnessVal = 1.0 - t * 0.3; // center is 1.0, neighbor is 0.7
+          const filter = t > 0.02
+            ? `grayscale(${grayscaleVal}%) sepia(${sepiaVal}%) brightness(${brightnessVal})`
+            : 'none';
 
           const transitionStyle = isDragging.current
             ? 'none'
@@ -114,28 +123,19 @@ export default function MobileStripGallery({
               onClick={(e) => handleCardClick(e, index)}
               style={{
                 ...styles.cardWrapper,
-                transform: `translate(-50%, -50%) translateX(calc(${translateX}vw + ${dragOffset}px)) scale(${scale})`,
+                transform: `translate(-50%, -50%) translateX(calc(${offset * 60}vw + ${dragOffset}px)) scale(${scale})`,
                 opacity,
                 filter,
                 transition: transitionStyle,
                 zIndex: isCenter ? 10 : 5,
               }}
             >
-              {isCenter ? (
-                <ActiveCard
-                  key={project.id}
-                  project={project}
-                  isMuted={isMuted}
-                  isPlaying={isPlaying}
-                />
-              ) : (
-                <img
-                  src={project.imageUrl}
-                  alt={project.title}
-                  style={styles.media}
-                  draggable="false"
-                />
-              )}
+              <VideoCard
+                project={project}
+                isCenter={isCenter}
+                isMuted={isMuted}
+                isPlaying={isCenter && isPlaying}
+              />
             </div>
           );
         })}
@@ -144,9 +144,10 @@ export default function MobileStripGallery({
   );
 }
 
-function ActiveCard({ project, isMuted, isPlaying }) {
+function VideoCard({ project, isCenter, isMuted, isPlaying }) {
   const videoRef = useRef(null);
   const audioRef = useRef(null);
+  const hasSeekedRef = useRef(false);
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -157,11 +158,26 @@ function ActiveCard({ project, isMuted, isPlaying }) {
       }
     } else {
       videoRef.current.pause();
+      if (videoRef.current.readyState >= 1) {
+        videoRef.current.currentTime = 5;
+      }
       if (audioRef.current) {
         audioRef.current.pause();
+        audioRef.current.currentTime = 0;
       }
     }
   }, [isPlaying, isMuted, project.songAudioUrl]);
+
+  const handleLoadedData = (e) => {
+    if (!isPlaying && e.target.readyState >= 1 && !hasSeekedRef.current) {
+      e.target.currentTime = 5;
+      hasSeekedRef.current = true;
+    }
+  };
+
+  useEffect(() => {
+    hasSeekedRef.current = false;
+  }, [project.videoUrl]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -171,11 +187,12 @@ function ActiveCard({ project, isMuted, isPlaying }) {
         poster={project.imageUrl}
         preload="auto"
         loop
-        muted={isMuted || !!project.songAudioUrl}
+        muted={isMuted || !isCenter || !!project.songAudioUrl}
         playsInline
         style={styles.media}
+        onLoadedData={handleLoadedData}
       />
-      {project.songAudioUrl && (
+      {project.songAudioUrl && isCenter && (
         <audio ref={audioRef} src={project.songAudioUrl} loop muted={isMuted} />
       )}
     </div>
