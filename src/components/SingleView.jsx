@@ -30,9 +30,10 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
 
       const player = playerRef.current = videojs(videoElement, {
         autoplay: true,
-        muted: isMuted,
+        muted: isMuted || !isPlayingSong || !!project.songAudioUrl,
         loop: true,
         controls: false,
+        preload: 'auto',
         sources: [{
           src: project.videoUrl,
           type: 'video/mp4' // Assuming mp4 from source links
@@ -48,6 +49,7 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
       const player = playerRef.current;
       if (player.currentSrc() !== project.videoUrl) {
          player.src({ src: project.videoUrl, type: 'video/mp4' });
+         player.muted(isMuted || !isPlayingSong || !!project.songAudioUrl);
          player.play().catch(e => console.log('Autoplay blocked:', e));
       }
     }
@@ -55,9 +57,9 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
 
   useEffect(() => {
     if (playerRef.current) {
-      playerRef.current.muted(isMuted);
+      playerRef.current.muted(isMuted || !isPlayingSong || !!project.songAudioUrl);
     }
-  }, [isMuted]);
+  }, [isMuted, isPlayingSong, project.songAudioUrl]);
 
   useEffect(() => {
     return () => {
@@ -159,10 +161,25 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
   const toggleSong = (e) => {
     e.stopPropagation();
     if (isPlayingSong) {
-      songAudioRef.current?.pause();
+      if (project.songAudioUrl) {
+        songAudioRef.current?.pause();
+      } else {
+        if (playerRef.current) {
+          playerRef.current.muted(true);
+        }
+      }
       setIsPlayingSong(false);
     } else {
-      songAudioRef.current?.play();
+      if (project.songAudioUrl) {
+        if (playerRef.current) {
+          playerRef.current.muted(true);
+        }
+        songAudioRef.current?.play().catch(err => console.log('Audio play blocked:', err));
+      } else {
+        if (playerRef.current) {
+          playerRef.current.muted(isMuted);
+        }
+      }
       setIsPlayingSong(true);
     }
   };
@@ -177,7 +194,7 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
       onMouseMove={handleMouseMove}
       onClick={handleVideoClick}
     >
-      <audio ref={songAudioRef} src={project.songAudioUrl} loop />
+      <audio ref={songAudioRef} src={project.songAudioUrl} loop muted={isMuted} />
       
       {/* Container for Video.js player */}
       <div 
@@ -211,7 +228,7 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
           <span className="sv-nav-text" style={styles.navText}>{prevProject.title.split(',')[0]}</span>
         </div>
         <svg width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '4px'}}>
-          <path d="M80 6H0M6 0L0 6L6 12" stroke="#1a1a1a" strokeWidth="1"/>
+          <path d="M80 6H0M6 0L0 6L6 12" stroke="#ffffff" strokeWidth="1"/>
         </svg>
       </div>
 
@@ -220,7 +237,7 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
           <span className="sv-nav-text" style={styles.navText}>{nextProject.title.split(',')[0]}</span>
         </div>
         <svg width="80" height="12" viewBox="0 0 80 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{marginTop: '4px'}}>
-          <path d="M0 6H80M74 0L80 6L74 12" stroke="#1a1a1a" strokeWidth="1"/>
+          <path d="M0 6H80M74 0L80 6L74 12" stroke="#ffffff" strokeWidth="1"/>
         </svg>
       </div>
 
@@ -463,7 +480,7 @@ const styles = {
     fontFamily: '"Playfair Display", serif',
     fontSize: '11px',
     letterSpacing: '1px',
-    color: '#1a1a1a',
+    color: '#ffffff',
     textAlign: 'center',
     lineHeight: 1.4,
     whiteSpace: 'pre-wrap',

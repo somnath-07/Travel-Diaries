@@ -147,6 +147,18 @@ body {
 }
 .video-js .vjs-tech {
   object-fit: cover !important;
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
+}
+
+/* Force hardware accelerated scaling and contrast optimization for all video elements */
+video {
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  transform: translate3d(0, 0, 0) !important;
+  backface-visibility: hidden !important;
 }
 
 .sv-seek-slider {
@@ -164,5 +176,21 @@ body {
   appearance: none;
   width: 0;
   height: 0;
+}
+
+/* Mouse trail animation for photo stack loader */
+@keyframes fadeAndScaleOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.65) rotate(var(--rot, 0deg));
+  }
+  15% {
+    opacity: 0.9;
+    transform: translate(-50%, -50%) scale(1) rotate(var(--rot, 0deg));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.85) rotate(var(--rot, 0deg)) translateY(15px);
+  }
 }
 

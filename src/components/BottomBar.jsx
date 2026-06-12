@@ -16,7 +16,7 @@ export default function BottomBar({ hoveredStripIndex, viewMode, setViewMode, is
             ? <VolumeX size={18} color="#1a1a1a" strokeWidth={1.5} />
             : <Volume2 size={18} color="#1a1a1a" strokeWidth={1.5} />}
         </button>
-        <span className="see-all-text" style={styles.seeAll}>26TH MARCH TO 3RD APRIL 2026</span>
+        <span className="see-all-text" style={styles.seeAll}>SOUND</span>
       </div>
 
       {/* Center section: Toggle buttons */}

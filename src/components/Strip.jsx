@@ -35,19 +35,33 @@ export default function Strip({ strip, index, hoveredStripIndex, onHover, onClic
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // Media Playback
+  const handleLoadedData = (e) => {
+    if (!isHovered && e.target.readyState >= 1) {
+      e.target.currentTime = 5;
+    }
+  };
+
+  // Media Playback & Preview seek
   useEffect(() => {
-    if (isHovered) {
-      if (videoRef.current) videoRef.current.play().catch((err) => console.log('Video play interrupted', err));
-      if (hoverAudioRef.current) hoverAudioRef.current.play().catch(e => console.log('Audio blocked:', e));
-    } else {
-      if (videoRef.current) videoRef.current.pause();
-      if (hoverAudioRef.current) {
-        hoverAudioRef.current.pause();
-        hoverAudioRef.current.currentTime = 0; // reset
+    if (videoRef.current) {
+      if (isHovered) {
+        videoRef.current.currentTime = 0;
+        videoRef.current.play().catch((err) => console.log('Video play interrupted', err));
+        if (strip.songAudioUrl && !isMuted && hoverAudioRef.current) {
+          hoverAudioRef.current.play().catch(e => console.log('Audio blocked:', e));
+        }
+      } else {
+        videoRef.current.pause();
+        if (videoRef.current.readyState >= 1) {
+          videoRef.current.currentTime = 5;
+        }
+        if (hoverAudioRef.current) {
+          hoverAudioRef.current.pause();
+          hoverAudioRef.current.currentTime = 0; // reset
+        }
       }
     }
-  }, [isHovered]);
+  }, [isHovered, isMuted, strip.songAudioUrl]);
 
   // GSAP Animation Logic for Opacity & Filter
   useEffect(() => {
@@ -136,14 +150,15 @@ export default function Strip({ strip, index, hoveredStripIndex, onHover, onClic
       >
         <img data-src={strip.imageUrl} className="lazyload" alt={strip.title} style={{ ...styles.media, position: 'absolute', zIndex: 1 }} />
         <video
-          className="lazyload"
           ref={videoRef}
-          data-src={strip.videoUrl}
-          data-poster={strip.imageUrl}
-          style={{ ...styles.media, position: 'relative', zIndex: 2 }}
+          src={strip.videoUrl}
+          poster={strip.imageUrl}
+          preload="auto"
+          style={{...styles.media, position: 'relative', zIndex: 2}}
           loop
-          muted={isMuted}
+          muted={isMuted || !!strip.songAudioUrl}
           playsInline
+          onLoadedData={handleLoadedData}
           onTimeUpdate={(e) => setCurrentTime(e.target.currentTime)}
           onLoadedMetadata={(e) => setDuration(e.target.duration)}
           onPlay={() => setIsPlaying(true)}

@@ -4,6 +4,7 @@ import StripGallery from './components/StripGallery';
 import DynamicTitle from './components/DynamicTitle';
 import BottomBar from './components/BottomBar';
 import SingleView from './components/SingleView';
+import Loader from './components/Loader';
 import { projectData } from './data/projects';
 import './index.css';
 
@@ -12,6 +13,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState('GRID'); // 'GRID' | 'SINGLE'
   const [activeProjectIndex, setActiveProjectIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
+  const [showLoader, setShowLoader] = useState(true);
 
   const handleHover = (index) => {
     setHoveredStripIndex(index);
@@ -24,19 +26,9 @@ export default function App() {
     setActiveProjectIndex(index);
   };
 
-  const bgAudioRef = useRef(null);
-
-  useEffect(() => {
-    if (viewMode === 'GRID' && hoveredStripIndex === null) {
-      bgAudioRef.current?.play().catch(e => console.log('Autoplay blocked:', e));
-    } else {
-      bgAudioRef.current?.pause();
-    }
-  }, [viewMode, hoveredStripIndex]);
-
   return (
     <div style={styles.appContainer}>
-      <audio ref={bgAudioRef} src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-17.mp3" loop muted={isMuted} />
+      {showLoader && <Loader onComplete={() => setShowLoader(false)} />}
       <TopNavBar />
 
       {viewMode === 'GRID' ? (
