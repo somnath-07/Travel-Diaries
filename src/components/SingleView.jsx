@@ -237,19 +237,19 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
           <div style={styles.mobileSidePadding} />
 
           {/* Slat 1 */}
-          <MobileSlatColumn topSpacerPx={40} windowHeightVh={24} />
+          <MobileSlatColumn topSpacerVh={6} windowHeightVh={22} />
           <div style={styles.mobileGap} />
           {/* Slat 2 */}
-          <MobileSlatColumn topSpacerPx={20} windowHeightVh={29} />
+          <MobileSlatColumn topSpacerVh={3} windowHeightVh={27} />
           <div style={styles.mobileGap} />
           {/* Slat 3 */}
-          <MobileSlatColumn topSpacerPx={0} windowHeightVh={34} />
+          <MobileSlatColumn topSpacerVh={0} windowHeightVh={32} />
           <div style={styles.mobileGap} />
           {/* Slat 4 */}
-          <MobileSlatColumn topSpacerPx={20} windowHeightVh={29} />
+          <MobileSlatColumn topSpacerVh={3} windowHeightVh={27} />
           <div style={styles.mobileGap} />
           {/* Slat 5 */}
-          <MobileSlatColumn topSpacerPx={40} windowHeightVh={24} />
+          <MobileSlatColumn topSpacerVh={6} windowHeightVh={22} />
 
           {/* Right Side Padding Column */}
           <div style={styles.mobileSidePadding} />
@@ -470,10 +470,10 @@ function StripColumn({ flex, top, window, bottom, children }) {
   );
 }
 
-function MobileSlatColumn({ topSpacerPx, windowHeightVh }) {
+function MobileSlatColumn({ topSpacerVh, windowHeightVh }) {
   return (
     <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ height: `${topSpacerPx}px`, backgroundColor: '#ece7df' }} />
+      <div style={{ height: `${topSpacerVh}vh`, backgroundColor: '#ece7df' }} />
       <div style={{ height: `${windowHeightVh}vh`, backgroundColor: 'transparent' }} />
       <div style={{ flex: 1, backgroundColor: '#ece7df' }} />
     </div>
@@ -665,16 +665,16 @@ const styles = {
   },
   mobileVideo: {
     position: 'absolute',
-    top: 0,
+    top: '25vh',
     left: 0,
     width: '100vw',
-    height: '100vh',
-    objectFit: 'cover',
+    height: '35vh',
+    overflow: 'hidden',
     zIndex: 11,
   },
   mobileSlatsContainer: {
     position: 'absolute',
-    top: '50px',
+    top: '25vh',
     left: 0,
     width: '100vw',
     height: '35vh',
@@ -690,7 +690,7 @@ const styles = {
   },
   mobileSongBannerWrapper: {
     position: 'absolute',
-    top: '20px',
+    top: '3vh',
     right: '6vw',
     width: '40px',
     height: '18vh',
@@ -701,13 +701,13 @@ const styles = {
     top: 0,
     left: 0,
     width: '100vw',
-    height: '50px',
+    height: '25vh',
     backgroundColor: '#ece7df',
     zIndex: 12,
   },
   mobileBottomMask: {
     position: 'absolute',
-    top: 'calc(50px + 35vh)',
+    top: '60vh',
     left: 0,
     width: '100vw',
     bottom: 0,
