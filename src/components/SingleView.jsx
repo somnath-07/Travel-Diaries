@@ -228,22 +228,31 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
           )}
         </div>
 
+        {/* Solid Top Masking Panel */}
+        <div style={styles.mobileTopMask} />
+
         {/* Slats Overlay */}
         <div style={styles.mobileSlatsContainer}>
+          {/* Left Side Padding Column */}
+          <div style={styles.mobileSidePadding} />
+
           {/* Slat 1 */}
-          <StripColumn flex="1" top="90px" window="24vh" bottom="calc(100% - 90px - 24vh)" />
+          <MobileSlatColumn topSpacerPx={40} windowHeightVh={24} />
           <div style={styles.mobileGap} />
           {/* Slat 2 */}
-          <StripColumn flex="1" top="70px" window="29vh" bottom="calc(100% - 70px - 29vh)" />
+          <MobileSlatColumn topSpacerPx={20} windowHeightVh={29} />
           <div style={styles.mobileGap} />
           {/* Slat 3 */}
-          <StripColumn flex="1" top="50px" window="34vh" bottom="calc(100% - 50px - 34vh)" />
+          <MobileSlatColumn topSpacerPx={0} windowHeightVh={34} />
           <div style={styles.mobileGap} />
           {/* Slat 4 */}
-          <StripColumn flex="1" top="70px" window="29vh" bottom="calc(100% - 70px - 29vh)" />
+          <MobileSlatColumn topSpacerPx={20} windowHeightVh={29} />
           <div style={styles.mobileGap} />
           {/* Slat 5 */}
-          <StripColumn flex="1" top="90px" window="24vh" bottom="calc(100% - 90px - 24vh)" />
+          <MobileSlatColumn topSpacerPx={40} windowHeightVh={24} />
+
+          {/* Right Side Padding Column */}
+          <div style={styles.mobileSidePadding} />
 
           {/* Sticky Song Banner on Mobile */}
           <div style={styles.mobileSongBannerWrapper}>
@@ -259,6 +268,9 @@ export default function SingleView({ project, allProjects, activeProjectIndex, s
             </div>
           </div>
         </div>
+
+        {/* Solid Bottom Masking Panel */}
+        <div style={styles.mobileBottomMask} />
 
         {/* Bottom details, controls & navigation */}
         <div style={styles.mobileBottomSection}>
@@ -458,6 +470,16 @@ function StripColumn({ flex, top, window, bottom, children }) {
   );
 }
 
+function MobileSlatColumn({ topSpacerPx, windowHeightVh }) {
+  return (
+    <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ height: `${topSpacerPx}px`, backgroundColor: '#ece7df' }} />
+      <div style={{ height: `${windowHeightVh}vh`, backgroundColor: 'transparent' }} />
+      <div style={{ flex: 1, backgroundColor: '#ece7df' }} />
+    </div>
+  );
+}
+
 const styles = {
   container: {
     position: 'absolute',
@@ -652,10 +674,10 @@ const styles = {
   },
   mobileSlatsContainer: {
     position: 'absolute',
-    top: 0,
-    left: '4vw',
-    width: '92vw',
-    height: '100vh',
+    top: '50px',
+    left: 0,
+    width: '100vw',
+    height: '35vh',
     display: 'flex',
     zIndex: 12,
     pointerEvents: 'none',
@@ -668,11 +690,34 @@ const styles = {
   },
   mobileSongBannerWrapper: {
     position: 'absolute',
-    top: '70px',
-    right: '6%',
+    top: '20px',
+    right: '6vw',
     width: '40px',
-    height: '20vh',
+    height: '18vh',
     zIndex: 20,
+  },
+  mobileTopMask: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '50px',
+    backgroundColor: '#ece7df',
+    zIndex: 12,
+  },
+  mobileBottomMask: {
+    position: 'absolute',
+    top: 'calc(50px + 35vh)',
+    left: 0,
+    width: '100vw',
+    bottom: 0,
+    backgroundColor: '#ece7df',
+    zIndex: 12,
+  },
+  mobileSidePadding: {
+    width: '6vw',
+    height: '100%',
+    backgroundColor: '#ece7df',
   },
   mobileBlackBanner: {
     position: 'absolute',
